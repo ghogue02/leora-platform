@@ -232,11 +232,9 @@ export async function POST(request: NextRequest) {
         id: sessionId,
         portalUserId: user.id,
         accessToken,
-        refreshToken,
         ipAddress: clientIP,
         userAgent,
         expiresAt: sessionExpiry,
-        refreshExpiresAt: sessionExpiry,
       },
     });
 

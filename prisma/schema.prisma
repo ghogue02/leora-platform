@@ -57,6 +57,9 @@ model Tenant {
   integrationTokens IntegrationToken[]
   complianceFilings ComplianceFiling[]
   stateTaxRates     StateTaxRate[]
+  roles             Role[]
+  permissions       Permission[]
+  rolePermissions   RolePermission[]
   carts             Cart[]
   lists             List[]
   notifications     Notification[]
@@ -148,21 +151,23 @@ enum UserStatus {
 }
 
 model Role {
-  id                String   @id @default(cuid())
-  name              String
-  displayName       String
-  description       String?
-  isSystemRole      Boolean  @default(false)
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  roleType    String?  @map("roleType")
+  isDefault   Boolean  @default(false) @map("isDefault")
+  isSystem    Boolean  @default(false) @map("isSystem")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  userRoles         UserRole[]
-  portalUserRoles   PortalUserRole[]
-  rolePermissions   RolePermission[]
+  userRoles       UserRole[]
+  portalUserRoles PortalUserRole[]
+  rolePermissions RolePermission[]
 
-  @@unique([name])
+  @@unique([tenantId, name])
   @@map("roles")
 }
 
@@ -181,34 +186,33 @@ model UserRole {
 }
 
 model Permission {
-  id                String   @id @default(cuid())
-  name              String   @unique
-  displayName       String
-  description       String?
-  resource          String
-  action            String
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  key         String   @unique @map("key")
+  name        String
+  description String?
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  rolePermissions   RolePermission[]
+  rolePermissions RolePermission[]
 
-  @@index([resource, action])
   @@map("permissions")
 }
 
 model RolePermission {
-  id                String   @id @default(cuid())
-  roleId            String
-  role              Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permissionId      String
-  permission        Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  tenantId     String
+  roleId       String
+  permissionId String
+  assignedAt   DateTime @default(now())
 
-  grantedAt         DateTime @default(now())
-  grantedBy         String?
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role        Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-  @@unique([roleId, permissionId])
+  @@id([tenantId, roleId, permissionId])
   @@map("role_permissions")
 }
 
@@ -278,24 +282,23 @@ model PortalUserRole {
 }
 
 model PortalSession {
-  id                String   @id @default(cuid())
-  portalUserId      String
-  portalUser        PortalUser @relation(fields: [portalUserId], references: [id], onDelete: Cascade)
+  id             String      @id @default(cuid())
+  portalUserId   String      @map("userId")
+  portalUser     PortalUser  @relation(fields: [portalUserId], references: [id], onDelete: Cascade)
 
-  accessToken       String   @unique
-  refreshToken      String?  @unique
-
-  ipAddress         String?
-  userAgent         String?
-
-  expiresAt         DateTime
-  refreshExpiresAt  DateTime?
-
-  createdAt         DateTime @default(now())
-  lastActiveAt      DateTime @default(now())
+  accessToken    String      @map("token")
+  ipAddress      String?     @map("ipAddress")
+  userAgent      String?     @map("userAgent")
+  deviceType     String?     @map("deviceType")
+  browser        String?     @map("browser")
+  os             String?     @map("os")
+  expiresAt      DateTime    @map("expiresAt")
+  lastActiveAt   DateTime    @default(now()) @map("lastActivity")
+  createdAt      DateTime    @default(now()) @map("createdAt")
 
   @@index([portalUserId])
-  @@index([accessToken])
+  @@index([expiresAt])
+  @@unique([accessToken])
   @@map("portal_sessions")
 }
 
