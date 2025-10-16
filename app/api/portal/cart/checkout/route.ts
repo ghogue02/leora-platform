@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       const cart = await tx.cart.findFirst({
         where: {
           portalUserId: user.id,
+          tenantId: tenant.tenantId,
           status: 'ACTIVE',
         },
         include: {

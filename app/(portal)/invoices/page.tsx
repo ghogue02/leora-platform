@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { useInvoices } from '@/lib/hooks/useInvoices';
 import { Search, FileText, Download } from 'lucide-react';
 
 /**
@@ -28,10 +29,20 @@ import { Search, FileText, Download } from 'lucide-react';
 export default function InvoicesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
 
-  // TODO: Replace with real data fetching using React Query
-  const isLoading = false;
-  const invoices: any[] = [];
+  const { data, isLoading, error } = useInvoices({
+    status: statusFilter || undefined,
+    page,
+    limit: 20,
+  });
+
+  const invoices = data?.invoices ?? [];
+  const filteredInvoices = invoices.filter((invoice) =>
+    searchQuery
+      ? invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
 
   const getStatusVariant = (status: string) => {
     switch (status.toLowerCase()) {
@@ -39,12 +50,26 @@ export default function InvoicesPage() {
         return 'success';
       case 'pending':
         return 'warning';
+      case 'partial':
+        return 'warning';
       case 'overdue':
         return 'destructive';
       default:
         return 'default';
     }
   };
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <EmptyState
+          icon={FileText}
+          title="Unable to load invoices"
+          description="Please try again later."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -79,6 +104,24 @@ export default function InvoicesPage() {
         </div>
       </div>
 
+      {/* Summary */}
+      {data && (
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
+          <Card className="p-6">
+            <p className="text-label text-muted mb-1">Total Invoiced</p>
+            <p className="text-heading-lg font-semibold">
+              {formatCurrency(data.summary.totalInvoiced)}
+            </p>
+          </Card>
+          <Card className="p-6">
+            <p className="text-label text-muted mb-1">Outstanding Balance</p>
+            <p className="text-heading-lg font-semibold text-warning">
+              {formatCurrency(data.summary.totalOutstanding)}
+            </p>
+          </Card>
+        </div>
+      )}
+
       {/* Invoices table */}
       <Card>
         <div className="overflow-x-auto">
@@ -86,7 +129,7 @@ export default function InvoicesPage() {
             <div className="p-6">
               <SkeletonTable rows={10} columns={5} />
             </div>
-          ) : invoices.length > 0 ? (
+          ) : filteredInvoices.length > 0 ? (
             <table className="w-full">
               <thead>
                 <tr className="border-b-2 border-border">
@@ -95,15 +138,16 @@ export default function InvoicesPage() {
                   <th className="p-4 text-left text-label font-semibold">Due Date</th>
                   <th className="p-4 text-left text-label font-semibold">Status</th>
                   <th className="p-4 text-left text-label font-semibold">Amount</th>
+                  <th className="p-4 text-left text-label font-semibold">Balance</th>
                   <th className="p-4 text-left text-label font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((invoice) => (
+                {filteredInvoices.map((invoice) => (
                   <tr key={invoice.id} className="border-b border-border hover:bg-muted/50">
-                    <td className="p-4 font-medium">{invoice.number}</td>
+                    <td className="p-4 font-medium">{invoice.invoiceNumber}</td>
                     <td className="p-4 text-body-md text-muted">
-                      {formatDate(invoice.date)}
+                      {formatDate(invoice.invoiceDate)}
                     </td>
                     <td className="p-4 text-body-md text-muted">
                       {formatDate(invoice.dueDate)}
@@ -114,7 +158,10 @@ export default function InvoicesPage() {
                       </Badge>
                     </td>
                     <td className="p-4 text-body-md font-medium">
-                      {formatCurrency(invoice.amount)}
+                      {formatCurrency(invoice.totalAmount)}
+                    </td>
+                    <td className="p-4 text-body-md font-medium">
+                      {formatCurrency(invoice.balanceDue)}
                     </td>
                     <td className="p-4">
                       <Button variant="ghost" size="sm">
@@ -136,6 +183,31 @@ export default function InvoicesPage() {
             </div>
           )}
         </div>
+        {data && data.pagination.totalPages > 1 && (
+          <div className="border-t-2 border-border p-4 flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <p className="text-body-sm text-muted">
+              Page {page} of {data.pagination.totalPages}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((prev) =>
+                data.pagination.totalPages ? Math.min(prev + 1, data.pagination.totalPages) : prev + 1
+              )}
+              disabled={page === data.pagination.totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </Card>
     </div>
   );
