@@ -7,29 +7,17 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
-import { randomBytes } from 'crypto';
 import {
   passwordResetRequestSchema,
   passwordResetSchema,
 } from '@/lib/auth/types';
-import { getRequestMetadata } from '@/lib/auth/middleware';
 import { prisma } from '@/lib/prisma';
+import { generateTokenPair, hashToken, isExpired } from '@/lib/auth/token-utils';
 
 /**
  * Request password reset - POST
  */
 export async function POST(request: NextRequest) {
-  // TODO: Implement password reset once schema includes reset token fields
-  return NextResponse.json(
-    {
-      success: false,
-      error: 'Password reset not yet implemented',
-      code: 'NOT_IMPLEMENTED',
-    },
-    { status: 501 }
-  );
-
-  /* Disabled until schema includes passwordResetToken and passwordResetExpiry fields
   try {
     const body = await request.json();
     const validation = passwordResetRequestSchema.safeParse(body);
@@ -46,8 +34,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, tenantSlug } = validation.data;
-    const { userAgent, ipAddress } = getRequestMetadata(request);
-
     // Resolve tenant
     const tenant = await prisma.tenant.findFirst({
       where: {
@@ -79,16 +65,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Generate reset token
-    const resetToken = randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const { token: resetToken, hashedToken, expiresAt } = generateTokenPair(60);
 
     // Save token to user
     await prisma.portalUser.update({
       where: { id: user.id },
       data: {
-        passwordResetToken: resetToken,
-        passwordResetExpiry: resetTokenExpiry,
+        passwordResetToken: hashedToken,
+        passwordResetExpiry: expiresAt,
       },
     });
 
@@ -109,10 +93,14 @@ export async function POST(request: NextRequest) {
 
     // TODO: Send reset email
     // await sendPasswordResetEmail(user.email, resetToken);
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[Auth] Password reset token for %s: %s', user.email, resetToken);
+    }
 
     return NextResponse.json({
       success: true,
       message: 'If an account exists, a password reset link has been sent',
+      resetToken: process.env.NODE_ENV !== 'production' ? resetToken : undefined,
     });
   } catch (error) {
     console.error('Password reset request error:', error);
@@ -124,24 +112,12 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-  */
 }
 
 /**
  * Confirm password reset - PUT
  */
 export async function PUT(request: NextRequest) {
-  // TODO: Implement password reset confirmation once schema includes reset token fields
-  return NextResponse.json(
-    {
-      success: false,
-      error: 'Password reset not yet implemented',
-      code: 'NOT_IMPLEMENTED',
-    },
-    { status: 501 }
-  );
-
-  /* Disabled until schema includes passwordResetToken and passwordResetExpiry fields
   try {
     const body = await request.json();
     const validation = passwordResetSchema.safeParse(body);
@@ -158,19 +134,16 @@ export async function PUT(request: NextRequest) {
     }
 
     const { token, password } = validation.data;
-    const { userAgent, ipAddress } = getRequestMetadata(request);
+    const hashedToken = hashToken(token);
 
     // Find user with valid reset token
     const user = await prisma.portalUser.findFirst({
       where: {
-        passwordResetToken: token,
-        passwordResetExpiry: {
-          gt: new Date(),
-        },
+        passwordResetToken: hashedToken,
       },
     });
 
-    if (!user) {
+    if (!user || isExpired(user.passwordResetExpiry)) {
       return NextResponse.json(
         {
           success: false,
@@ -190,13 +163,15 @@ export async function PUT(request: NextRequest) {
         passwordHash,
         passwordResetToken: null,
         passwordResetExpiry: null,
+        failedLoginAttempts: 0,
+        lockedUntil: null,
       },
     });
 
     // Invalidate all existing sessions
-    // await prisma.portalSession.deleteMany({
-    //   where: { portalUserId: user.id },
-    // });
+    await prisma.portalSession.deleteMany({
+      where: { portalUserId: user.id },
+    });
 
     // TODO: Log activity (authActivityLog table not yet implemented)
     // await prisma.authActivityLog.create({
@@ -224,5 +199,4 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-  */
 }

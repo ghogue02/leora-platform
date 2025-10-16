@@ -7,11 +7,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
-import { randomBytes } from 'crypto';
 import { registrationSchema, type AuthResponse } from '@/lib/auth/types';
 import { getRequestMetadata } from '@/lib/auth/middleware';
 import { getClientIP } from '@/lib/auth/rate-limit';
-import { prisma } from '@/lib/prisma';
+import { ensureDefaultPortalRole, prisma } from '@/lib/prisma';
+import { generateTokenPair } from '@/lib/auth/token-utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,9 +82,8 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hash(password, 12);
 
-    // TODO: Generate email verification token when verification is implemented
-    // const emailVerificationToken = randomBytes(32).toString('hex');
-    // const emailVerificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Generate email verification token (24 hour TTL)
+    const { token: verificationToken, hashedToken, expiresAt } = generateTokenPair(24 * 60);
 
     // Create user
     const user = await prisma.portalUser.create({
@@ -95,28 +94,22 @@ export async function POST(request: NextRequest) {
         lastName,
         fullName: `${firstName} ${lastName}`,
         tenantId: tenant.id,
-        status: 'ACTIVE', // TODO: Set to INACTIVE when email verification is implemented
-        emailVerified: true, // TODO: Set to false when email verification is implemented
-        emailVerifiedAt: new Date(),
+        phone: phoneNumber,
+        status: 'PENDING',
+        emailVerified: false,
+        emailVerificationToken: hashedToken,
+        emailVerificationExpiry: expiresAt,
       },
     });
 
     // Assign default portal customer role
-    const defaultRole = await prisma.role.findFirst({
-      where: {
-        name: 'portal_customer',
+    const portalRole = await ensureDefaultPortalRole(tenant.id);
+    await prisma.portalUserRole.create({
+      data: {
+        portalUserId: user.id,
+        roleId: portalRole.id,
       },
     });
-
-    if (defaultRole) {
-      // Create user-role association
-      // await prisma.portalUserRole.create({
-      //   data: {
-      //     portalUserId: user.id,
-      //     roleId: defaultRole.id,
-      //   },
-      // });
-    }
 
     // TODO: Log registration activity (authActivityLog table not yet implemented)
     // await prisma.authActivityLog.create({
@@ -135,7 +128,10 @@ export async function POST(request: NextRequest) {
     // });
 
     // TODO: Send verification email
-    // await sendVerificationEmail(user.email, emailVerificationToken);
+    // await sendVerificationEmail(user.email, verificationToken);
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[Auth] Verification token generated for %s: %s', user.email, verificationToken);
+    }
 
     const response: AuthResponse = {
       success: true,
@@ -146,13 +142,18 @@ export async function POST(request: NextRequest) {
         email: user.email,
         firstName: (user as any).firstName,
         lastName: (user as any).lastName,
-        displayName: (user as any).displayName,
+        displayName:
+          (user as any).displayName ||
+          `${(user as any).firstName || ''} ${(user as any).lastName || ''}`.trim() ||
+          user.email,
         tenantId: user.tenantId,
         tenantSlug: tenant.slug,
-        roles: ['portal_customer'],
+        roles: [portalRole.name],
         permissions: [],
         emailVerified: false,
       },
+      verificationToken:
+        process.env.NODE_ENV !== 'production' ? verificationToken : undefined,
     };
 
     return NextResponse.json(response, { status: 201 });

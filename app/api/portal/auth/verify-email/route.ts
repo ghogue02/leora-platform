@@ -4,29 +4,21 @@
  * Verifies user email address with token from registration email.
  */
 
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { emailVerificationSchema } from '@/lib/auth/types';
+import { emailVerificationSchema, type AuthResponse } from '@/lib/auth/types';
 import { getRequestMetadata } from '@/lib/auth/middleware';
 import { getPermissionsForRoles } from '@/lib/auth/rbac';
 import {
   generateTokenPair,
   setAuthCookies,
   type TokenUser,
+  REFRESH_TOKEN_MAX_AGE,
 } from '@/lib/auth/jwt';
 import { prisma } from '@/lib/prisma';
+import { hashToken, isExpired } from '@/lib/auth/token-utils';
 
 export async function POST(request: NextRequest) {
-  // TODO: Implement email verification once schema includes verification token fields
-  return NextResponse.json(
-    {
-      success: false,
-      error: 'Email verification not yet implemented',
-      code: 'NOT_IMPLEMENTED',
-    },
-    { status: 501 }
-  );
-
-  /* Disabled until schema includes emailVerificationToken and emailVerificationExpiry fields
   try {
     const body = await request.json();
     const validation = emailVerificationSchema.safeParse(body);
@@ -43,15 +35,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { token } = validation.data;
+    const hashedToken = hashToken(token);
     const { userAgent, ipAddress } = getRequestMetadata(request);
 
-    // Find user with valid verification token
     const user = await prisma.portalUser.findFirst({
       where: {
-        // emailVerificationToken: token,
-        // emailVerificationExpiry: {
-        //   gt: new Date(),
-        // },
+        emailVerificationToken: hashedToken,
       },
       include: {
         tenant: true,
@@ -71,7 +60,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (!user) {
+    if (!user || isExpired(user.emailVerificationExpiry)) {
       return NextResponse.json(
         {
           success: false,
@@ -81,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update user verification status
     await prisma.portalUser.update({
       where: { id: user.id },
       data: {
@@ -93,84 +81,65 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Log verification activity (authActivityLog table not yet implemented)
-    // await prisma.authActivityLog.create({
-    //   data: {
-    //     portalUserId: user.id,
-    //     tenantId: user.tenantId,
-    //     action: 'email_verified',
-    //     ipAddress,
-    //     userAgent,
-    //     success: true,
-    //     metadata: {
-    //       email: user.email,
-    //     },
-    //   },
-    // });
-
-    // Auto-login: Create session and issue tokens
-    const roles = (user as any).roleAssignments?.map((ra: any) => ra.role.name) || ['portal_customer'];
+    const roles =
+      user.roleAssignments?.map((assignment) => assignment.role.name) || [];
     const permissions =
-      (user as any).roleAssignments?.flatMap((ra: any) =>
-        ra.role.rolePermissions?.map((rp: any) => rp.permission.name)
+      user.roleAssignments?.flatMap((assignment) =>
+        assignment.role.rolePermissions?.map((rp) => rp.permission.key)
       ) || getPermissionsForRoles(roles);
 
-    const session = await prisma.portalSession.create({
-      data: {
+    const sessionId = randomUUID();
+    const { accessToken, refreshToken } = await generateTokenPair(
+      {
+        id: (user as any).userId || user.id,
         portalUserId: user.id,
+        email: user.email,
         tenantId: user.tenantId,
-        accessToken: '',
+        tenantSlug: user.tenant?.slug || '',
+        roles,
+        permissions,
+      },
+      sessionId
+    );
+
+    const sessionExpiry = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE * 1000);
+
+    await prisma.portalSession.create({
+      data: {
+        id: sessionId,
+        portalUserId: user.id,
+        accessToken,
         ipAddress,
         userAgent,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        lastActiveAt: new Date(),
+        expiresAt: sessionExpiry,
       },
     });
-
-    const tokenUser: TokenUser = {
-      id: (user as any).userId || user.id,
-      portalUserId: user.id,
-      email: user.email,
-      tenantId: user.tenantId,
-      tenantSlug: (user as any).tenant?.slug || '',
-      roles,
-      permissions,
-    };
-
-    const { accessToken, refreshToken } = await generateTokenPair(
-      tokenUser,
-      session.id
-    );
 
     await setAuthCookies(accessToken, refreshToken);
 
-    // Update session with tokens
-    await prisma.portalSession.update({
-      where: { id: session.id },
-      data: {
-        accessToken,
-        refreshToken,
-      },
-    });
-
-    return NextResponse.json({
+    const response: AuthResponse = {
       success: true,
       message: 'Email verified successfully',
       user: {
-        id: tokenUser.id,
+        id: (user as any).userId || user.id,
         portalUserId: user.id,
         email: user.email,
         firstName: (user as any).firstName,
         lastName: (user as any).lastName,
-        displayName: (user as any).displayName,
+        displayName:
+          (user as any).displayName ||
+          `${(user as any).firstName || ''} ${(user as any).lastName || ''}`.trim() ||
+          user.email,
         tenantId: user.tenantId,
-        tenantSlug: (user as any).tenant?.slug || '',
+        tenantSlug: user.tenant?.slug || '',
         roles,
         permissions,
-        sessionId: session.id,
+        sessionId,
         emailVerified: true,
       },
-    });
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('Email verification error:', error);
     return NextResponse.json(
@@ -181,5 +150,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-  */
 }
