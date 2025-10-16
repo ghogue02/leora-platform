@@ -4,12 +4,19 @@
  */
 
 import { NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requirePermission } from '@/app/api/_utils/auth';
 import { withTenant } from '@/lib/prisma';
 import { checkoutSchema } from '@/lib/validations/portal';
-import { getPriceForProduct } from '../items/implementation';
+import {
+  adjustInventoryForOrder,
+  computeTenantCharges,
+  generateOrderNumber,
+  prepareOrderLines,
+} from '@/lib/services/order-service';
+import { resolveProductPrice } from '@/lib/services/pricing';
 
 /**
  * Process checkout
@@ -89,7 +96,8 @@ export async function POST(request: NextRequest) {
       let subtotal = 0;
       const pricedLines = await Promise.all(
         cart.items.map(async (item) => {
-          const price = await getPriceForProduct(tx, item.productId, customerId);
+          const priceResult = await resolveProductPrice(tx, item.productId);
+          const price = priceResult.price;
           const lineTotal = price * item.quantity;
           subtotal += lineTotal;
 
@@ -132,8 +140,10 @@ export async function POST(request: NextRequest) {
             : null,
           lines: {
             create: pricedLines.map((line, index) => ({
+              product: {
+                connect: { id: line.productId }
+              },
               lineNumber: index + 1,
-              productId: line.productId,
               quantity: line.quantity,
               unitPrice: line.unitPrice,
               subtotal: line.totalPrice,

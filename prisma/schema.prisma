@@ -67,11 +67,6 @@ model Tenant {
   @@map("tenants")
 }
 
-enum TenantStatus {
-  ACTIVE
-  SUSPENDED
-  ARCHIVED
-}
 
 model TenantSettings {
   id                String   @id @default(cuid())
@@ -144,11 +139,6 @@ model User {
   @@map("users")
 }
 
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-  LOCKED
-}
 
 model Role {
   id          String   @id @default(cuid())
@@ -237,6 +227,10 @@ model PortalUser {
   status            String   @default("ACTIVE")
   emailVerified     Boolean  @default(false)
   emailVerifiedAt   DateTime?
+  emailVerificationToken String?
+  emailVerificationExpiry DateTime?
+  passwordResetToken String?
+  passwordResetExpiry DateTime?
 
   failedLoginAttempts Int    @default(0)
   lockedUntil       DateTime?
@@ -259,14 +253,11 @@ model PortalUser {
   @@unique([tenantId, email])
   @@index([tenantId, customerId])
   @@index([tenantId, status])
+  @@index([emailVerificationToken])
+  @@index([passwordResetToken])
   @@map("portal_users")
 }
 
-enum PortalUserStatus {
-  ACTIVE
-  INACTIVE
-  LOCKED
-}
 
 model PortalUserRole {
   id                String   @id @default(cuid())
@@ -322,7 +313,7 @@ model Product {
   vintage           String?
   region            String?
 
-  alcoholType       AlcoholType?
+  alcoholType       String?
   alcoholPercent    Decimal? @db.Decimal(5,2)
 
   imageUrl          String?
@@ -351,21 +342,7 @@ model Product {
   @@map("products")
 }
 
-enum AlcoholType {
-  WINE
-  BEER
-  SPIRITS
-  CIDER
-  SAKE
-  MEAD
-  OTHER
-}
 
-enum ProductStatus {
-  ACTIVE
-  INACTIVE
-  DISCONTINUED
-}
 
 model Sku {
   id                String   @id @default(cuid())
@@ -402,10 +379,6 @@ model Sku {
   @@map("skus")
 }
 
-enum SkuStatus {
-  ACTIVE
-  INACTIVE
-}
 
 model Inventory {
   id                String   @id @default(cuid())
@@ -510,11 +483,6 @@ model Customer {
   @@map("customers")
 }
 
-enum CustomerStatus {
-  ACTIVE
-  INACTIVE
-  SUSPENDED
-}
 
 model Supplier {
   id                String   @id @default(cuid())
@@ -603,16 +571,6 @@ model Order {
   @@map("orders")
 }
 
-enum OrderStatus {
-  DRAFT
-  PENDING
-  CONFIRMED
-  IN_PROGRESS
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  ON_HOLD
-}
 
 model OrderLine {
   id                String   @id @default(cuid())
@@ -688,15 +646,6 @@ model Invoice {
   @@map("invoices")
 }
 
-enum InvoiceStatus {
-  DRAFT
-  SENT
-  VIEWED
-  PARTIAL
-  PAID
-  OVERDUE
-  CANCELLED
-}
 
 model Payment {
   id                String   @id @default(cuid())
@@ -732,13 +681,6 @@ model Payment {
   @@map("payments")
 }
 
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-  CANCELLED
-}
 
 // ============================================================================
 // COMMERCE: CART & LISTS
@@ -778,12 +720,6 @@ model Cart {
   @@map("carts")
 }
 
-enum CartStatus {
-  ACTIVE
-  CONVERTED
-  ABANDONED
-  EXPIRED
-}
 
 model CartItem {
   id                String   @id @default(cuid())
@@ -886,19 +822,7 @@ model Activity {
   @@map("activities")
 }
 
-enum ActivityStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
 
-enum ActivityPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
 
 model CallPlan {
   id                String   @id @default(cuid())
@@ -930,12 +854,6 @@ model CallPlan {
   @@map("call_plans")
 }
 
-enum CallPlanStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELLED
-  RESCHEDULED
-}
 
 model Task {
   id                String   @id @default(cuid())
@@ -966,19 +884,7 @@ model Task {
   @@map("tasks")
 }
 
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
 
-enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
 
 // ============================================================================
 // INTELLIGENCE: HEALTH & METRICS
@@ -1076,12 +982,6 @@ model ComplianceFiling {
   @@map("compliance_filings")
 }
 
-enum FilingStatus {
-  PENDING
-  FILED
-  OVERDUE
-  REJECTED
-}
 
 model StateTaxRate {
   id                String   @id @default(cuid())
@@ -1089,7 +989,7 @@ model StateTaxRate {
   tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   state             String
-  alcoholType       AlcoholType
+  alcoholType       String
 
   exciseTaxRate     Decimal  @db.Decimal(10,4)
   salesTaxRate      Decimal  @db.Decimal(5,4)
@@ -1142,12 +1042,6 @@ model WebhookSubscription {
   @@map("webhook_subscriptions")
 }
 
-enum WebhookStatus {
-  ACTIVE
-  PAUSED
-  DISABLED
-  ERROR
-}
 
 model WebhookEvent {
   id                String   @id @default(cuid())
@@ -1196,12 +1090,6 @@ model WebhookDelivery {
   @@map("webhook_deliveries")
 }
 
-enum DeliveryStatus {
-  PENDING
-  DELIVERED
-  FAILED
-  CANCELLED
-}
 
 model IntegrationToken {
   id                String   @id @default(cuid())
@@ -1229,11 +1117,6 @@ model IntegrationToken {
   @@map("integration_tokens")
 }
 
-enum TokenStatus {
-  ACTIVE
-  EXPIRED
-  REVOKED
-}
 
 // ============================================================================
 // NOTIFICATIONS
@@ -1266,9 +1149,3 @@ model Notification {
   @@map("notifications")
 }
 
-enum NotificationPriority {
-  LOW
-  NORMAL
-  HIGH
-  URGENT
-}
