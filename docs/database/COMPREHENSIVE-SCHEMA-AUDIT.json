@@ -1,0 +1,6088 @@
+{
+  "auditDate": "2025-10-16T20:15:12.539Z",
+  "totalTables": 80,
+  "tables": [
+    {
+      "tableName": "_prisma_migrations",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "character varying",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "checksum",
+          "type": "character varying",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "migration_name",
+          "type": "character varying",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "logs",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "rolled_back_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "applied_steps_count",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "account_health_snapshots",
+      "totalColumns": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "capturedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "healthStatus",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "avgOrderIntervalDays",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "currentMonthlyRevenue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "averageMonthlyRevenue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "dormancyThresholdDays",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "paceRiskThresholdDays",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "revenueRiskThresholdRate",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "activities",
+      "totalColumns": 14,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salesRepId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "activityTypeId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "plannedFor",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "occurredAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "durationMinutes",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "followUpRequired",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "followUpCompletedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "conversionCapturedOrder",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "activity_types",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "weightCategory",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "addresses",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "line1",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "line2",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "province",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "country",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "postalCode",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isPrimary",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "automated_tasks",
+      "totalColumns": 18,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "reasoning",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "dueDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "revenueImpact",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "completedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "completedBy",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedToId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "call_plan_items",
+      "totalColumns": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "callPlanId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "activityTypeId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "activityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "plannedFor",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "completedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "call_plans",
+      "totalColumns": 9,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salesRepId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "territoryId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "weekStart",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "cart_items",
+      "totalColumns": 9,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "cartId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "quantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "cases",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "netPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "addedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "carts",
+      "totalColumns": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "portalUserId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "lastModifiedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "savedForLater",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "itemCount",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tax",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "total",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "companies",
+      "totalColumns": 18,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "balance",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "twelveMonthSales",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastOrderDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "licenseNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "taxNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryInstructions",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "parentCompanyId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "latitude",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "longitude",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "compliance_filings",
+      "totalColumns": 15,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "period",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "dueDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "confidenceScore",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "sageFileId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "halFileId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "totalGallons",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "exciseTax",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "generatedFile",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "submittedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "compliance_transactions",
+      "totalColumns": 17,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "filingId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "invoiceDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "invoiceId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "quantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "gallons",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "exciseTax",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "licenseNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "wineType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "abv",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "contacts",
+      "totalColumns": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "firstName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "salutation",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isPrimary",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "customer_activity_logs",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "entityType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "ipAddress",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "userAgent",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "customer_documents",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "uploadedBy",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "fileSize",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "mimeType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "storageKey",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "uploadedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "customer_notifications",
+      "totalColumns": 16,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "actionUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "actionLabel",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "read",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "readAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "dismissed",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "customers",
+      "totalColumns": 39,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salespersonId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "territoryId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "routeId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "creditLimit",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "creditStatus",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "balanceDue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "paymentTerms",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "preferredWarehouse",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "healthStatus",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "establishedPace",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "avgOrderIntervalDays",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastOrderDeliveredAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "projectedNextOrderDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "currentMonthlyRevenue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "averageMonthlyRevenue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastRevenueRiskDetectedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "churnRiskScore",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastAnalyzedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "avgOrderValue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "orderFrequency",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lifetimeValue",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "accountNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "tradeName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "primaryContactName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "primaryContactEmail",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "primaryContactPhone",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "billingAddress",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingAddress",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "tier",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "licenseNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "licenseState",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "licenseExpiry",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "email_verification_tokens",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "verifiedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "integration_tokens",
+      "totalColumns": 9,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "hashedKey",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "scopes",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastUsedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "inventory",
+      "totalColumns": 21,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "warehouse",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "pool",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "batch",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "casesOnHand",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitsOnHand",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitCost",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "pendingOrdersCases",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "pendingOrdersUnits",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "skuId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "warehouseLocation",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "quantityOnHand",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "quantityReserved",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "quantityAvailable",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "reorderPoint",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "reorderQuantity",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastRestockedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "invoice_lines",
+      "totalColumns": 11,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "invoiceId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "quantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "cases",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "liters",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "netPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "invoices",
+      "totalColumns": 26,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "invoiceNumber",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salespersonId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "invoiceDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "postedDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "dueDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "poNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryStartTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryEndTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingLine1",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingLine2",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingCity",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingProvince",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingCountry",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "shippingPostalCode",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tax",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "total",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "amountPaid",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "list_items",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "listId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "lists",
+      "totalColumns": 9,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "portalUserId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isDefault",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "isShared",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "login_logs",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "success",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "ipAddress",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "userAgent",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "timestamp",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "notes",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "noteType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "notification_logs",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "notificationId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "recipient",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "sentAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveredAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "errorMessage",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "notification_preferences",
+      "totalColumns": 20,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "emailEnabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "emailFrequency",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "inAppEnabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "smsEnabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "smsNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "smsCriticalOnly",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "pushEnabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "pushSubscription",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "stockoutAlerts",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "churnAlerts",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "complianceAlerts",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "opportunityAlerts",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "taskAlerts",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "quietHoursEnabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "quietHoursStart",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "quietHoursEnd",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "notifications",
+      "totalColumns": 18,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "actionUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "actionLabel",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "read",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "readAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "dismissed",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "snoozedUntil",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "order_lines",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "orderId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "quantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "cases",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "liters",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "netPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "applied_pricing_rules",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "skuId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "orders",
+      "totalColumns": 34,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "orderNumber",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salespersonId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "orderDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "deliveryDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "actualDeliveryDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "poNumber",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryStartTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryEndTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tax",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "total",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "portalUserId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "requestedDeliveryDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "taxAmount",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "shippingAmount",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "discountAmount",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "totalAmount",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "shippingAddress",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "billingAddress",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "internalNotes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isSampleOrder",
+          "type": "boolean",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "createdBy",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "password_reset_tokens",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "usedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "payments",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "invoiceId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "paymentDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "amount",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "paymentMethod",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "reference",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "permissions",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "key",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "portal_alert_settings",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "brokenUrlThreshold",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "emailRecipients",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "slackWebhook",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastAlertSent",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "portal_sessions",
+      "totalColumns": 11,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "ipAddress",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "userAgent",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "deviceType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "browser",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "os",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "expiresAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "lastActivity",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "portal_user_preferences",
+      "totalColumns": 16,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "itemsPerPage",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "defaultView",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "showPricesInclTax",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "emailNotifications",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "orderUpdates",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "invoiceReminders",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "productUpdates",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "marketingEmails",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "defaultShippingAddressId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "defaultBillingAddressId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "defaultDeliveryTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "preferredContactMethod",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "portal_user_role_assignments",
+      "totalColumns": 4,
+      "columns": [
+        {
+          "name": "portalUserId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "roleId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "portal_user_roles",
+      "totalColumns": 4,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "portalUserId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "roleId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "portal_users",
+      "totalColumns": 34,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "passwordHash",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "emailVerified",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "emailVerifiedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "firstName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "lastName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "contactId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "lockedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lockedReason",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastLoginAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastLoginIp",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "failedLoginCount",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "lastFailedLogin",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdBy",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "fullName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "failedLoginAttempts",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "lockedUntil",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "preferences",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "emailVerificationToken",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "emailVerificationExpiry",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "passwordResetToken",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "passwordResetExpiry",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "price_list_assignments",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priceListId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "price_list_entries",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priceListName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "unitPrice",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "minQuantity",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "maxQuantity",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "customerTier",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "validFrom",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "validUntil",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "price_lists",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "product_list_items",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "listId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "quantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "addedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "product_lists",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isDefault",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "product_prices",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "priceListId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "minQuantity",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "priceType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "price",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "products",
+      "totalColumns": 33,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "itemNumber",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "sku",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "brand",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "supplierId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "manufacturer",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "vintage",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "style",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "color",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "varieties",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "alcoholPercent",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "unitSize",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "unitType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "itemsPerCase",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "currentStock",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "reorderPoint",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "leadTimeDays",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "avgMonthlySales",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastAnalyzedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "varietal",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "alcoholType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "imageUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "images",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isSample",
+          "type": "boolean",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "role_permissions",
+      "totalColumns": 4,
+      "columns": [
+        {
+          "name": "roleId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "permissionId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "roles",
+      "totalColumns": 9,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "roleType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "isDefault",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "isSystem",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "routes",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "territoryId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "deliveryDays",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "primarySalesRepId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "sales_metrics",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "period",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "metricType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "entityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "entityType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "value",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "sales_rep_profiles",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "monthlyQuota",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "commissionRate",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "territories",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "saved_products",
+      "totalColumns": 5,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "addedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "skus",
+      "totalColumns": 14,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "productId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "skuCode",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "upc",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "unitSize",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "unitType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "unitsPerCase",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "unitCost",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "basePrice",
+          "type": "numeric",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "state_agency_contacts",
+      "totalColumns": 8,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "agencyName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "isPrimary",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "state_compliance",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "lastUpdated",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "state_configurations",
+      "totalColumns": 11,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "taxRateTable",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "taxRateSparkling",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "taxRateCider",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "taxRateHighABV",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "filingFrequency",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "dayOfMonth",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "portalUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "state_filing_info",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "frequency",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "dueDate",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "dayOfMonth",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "gracePeriodDays",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "latePenalty",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "portalUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "portalType",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "portalLogin",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "state_franchise_laws",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "protectionLevel",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "hasProtection",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "noticeRequiredDays",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "compensationRequired",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "goodCauseRequired",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "legalCitation",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "terminationProcess",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "state_required_fields",
+      "totalColumns": 6,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "fieldName",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "state_tax_rates",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "wineType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "rate",
+          "type": "numeric",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "effectiveDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "suppliers",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "companyId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "leadTime",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "contactName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "contactEmail",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "address",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "tasks",
+      "totalColumns": 15,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "priority",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "dueDate",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedToId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdById",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "customerId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "relatedActivityId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "completedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "tenant_settings",
+      "totalColumns": 10,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "dormancyDays",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "paceRiskPercentage",
+          "type": "double precision",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "revenueRiskPercentage",
+          "type": "double precision",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "topAccountsLookback",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "sampleMonthlyAllowance",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "sampleApprovalThreshold",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "tenants",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "subscriptionTier",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "billingEmail",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "contactEmail",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "logoUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "primaryColor",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "territories",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "salesManagerId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "uploaded_files",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "size",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "rowCount",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "uploadedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "url_change_history",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "oldUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "newUrl",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "changedBy",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "changedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "url_health_checks",
+      "totalColumns": 12,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "statusCode",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "redirectUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "redirectCount",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "responseTime",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "errorMessage",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastChecked",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "user_deadline_reminders",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateCode",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "deadlineDate",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "reminderDaysBefore",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "emailSent",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "user_preferences",
+      "totalColumns": 7,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "favoriteStates",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "defaultView",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "theme",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "user_role_assignments",
+      "totalColumns": 4,
+      "columns": [
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "roleId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "user_roles",
+      "totalColumns": 5,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "roleId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "assignedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "assignedBy",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "user_state_preferences",
+      "totalColumns": 5,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "user_id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "state_code",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        }
+      ]
+    },
+    {
+      "tableName": "user_watchlist",
+      "totalColumns": 5,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "stateCode",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "addedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "users",
+      "totalColumns": 20,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "passwordHash",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "firstName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "fullName",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "avatarUrl",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "emailVerified",
+          "type": "boolean",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "emailVerifiedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "failedLoginAttempts",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": true
+        },
+        {
+          "name": "lockedUntil",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastLoginAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "lastLoginIp",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "webhook_deliveries",
+      "totalColumns": 11,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "subscriptionId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "eventId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "attemptCount",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "lastAttemptAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "responseCode",
+          "type": "integer",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "responseBody",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "errorMessage",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "webhook_events",
+      "totalColumns": 11,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "subscriptionId",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "eventType",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "availableAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "processedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "errorMessage",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        }
+      ]
+    },
+    {
+      "tableName": "webhook_subscriptions",
+      "totalColumns": 13,
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "tenantId",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "secret",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "events",
+          "type": "ARRAY",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "failureCount",
+          "type": "integer",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "lastDeliveredAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "pausedAt",
+          "type": "timestamp without time zone",
+          "nullable": true,
+          "hasDefault": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": true
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "hasDefault": false
+        },
+        {
+          "name": "retryPolicy",
+          "type": "jsonb",
+          "nullable": true,
+          "hasDefault": false
+        }
+      ]
+    }
+  ],
+  "potentialMismatches": [
+    {
+      "table": "activity_types",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "addresses",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "companies",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "contacts",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "contacts",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "customer_documents",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "customers",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "notes",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "portal_users",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "price_list_assignments",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "price_lists",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "products",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "skus",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "state_configurations",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    },
+    {
+      "table": "suppliers",
+      "issue": "Has companyId (FK) but NOT companyName",
+      "action": "Use company relation instead of companyName field"
+    },
+    {
+      "table": "users",
+      "issue": "Has active (boolean) but NOT status (text)",
+      "action": "Use active: true instead of status: \"ACTIVE\""
+    }
+  ]
+}

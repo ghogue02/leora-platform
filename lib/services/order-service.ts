@@ -58,7 +58,7 @@ async function prepareOrderLines(
       where: {
         id: line.productId,
         tenantId,
-        status: 'ACTIVE',
+        active: true,
       },
       select: {
         id: true,
@@ -135,11 +135,12 @@ async function prepareOrderLines(
 
 export async function adjustInventoryForOrder(
   tx: TxClient,
+  tenantId: string,
   adjustments: Array<{ productId: string; quantity: number }>
 ) {
   for (const adjustment of adjustments) {
     await tx.inventory.updateMany({
-      where: { productId: adjustment.productId },
+      where: { productId: adjustment.productId, tenantId },
       data: {
         quantityAvailable: { decrement: adjustment.quantity },
         quantityReserved: { increment: adjustment.quantity },
@@ -150,11 +151,12 @@ export async function adjustInventoryForOrder(
 
 export async function releaseInventoryForOrder(
   tx: TxClient,
+  tenantId: string,
   adjustments: Array<{ productId: string; quantity: number }>
 ) {
   for (const adjustment of adjustments) {
     await tx.inventory.updateMany({
-      where: { productId: adjustment.productId },
+      where: { productId: adjustment.productId, tenantId },
       data: {
         quantityAvailable: { increment: adjustment.quantity },
         quantityReserved: { decrement: adjustment.quantity },

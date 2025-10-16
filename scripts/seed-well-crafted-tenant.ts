@@ -106,7 +106,7 @@ const SAMPLE_PRODUCTS = [
     region: 'Napa Valley',
     alcoholType: 'WINE' as const,
     alcoholPercent: 14.5,
-    status: 'ACTIVE' as const,
+    active: true,
     basePrice: 58.0,
     initialInventory: 180,
   },
@@ -121,7 +121,7 @@ const SAMPLE_PRODUCTS = [
     region: 'Sonoma Coast',
     alcoholType: 'WINE' as const,
     alcoholPercent: 13.5,
-    status: 'ACTIVE' as const,
+    active: true,
     basePrice: 34.0,
     initialInventory: 220,
   },
@@ -136,7 +136,7 @@ const SAMPLE_PRODUCTS = [
     region: 'Willamette Valley',
     alcoholType: 'WINE' as const,
     alcoholPercent: 13.0,
-    status: 'ACTIVE' as const,
+    active: true,
     basePrice: 49.5,
     initialInventory: 160,
   },
@@ -438,7 +438,7 @@ async function seedProducts(tenantId: string) {
         },
       },
       update: {
-        status: productInput.status,
+        active: productInput.active,
         description: productInput.description,
       },
       create: {
@@ -463,7 +463,7 @@ async function seedProducts(tenantId: string) {
           variantName: 'Case (12x750ml)',
           caseQuantity: 12,
           basePrice,
-          status: 'ACTIVE',
+          active: true,
         },
       });
     }
@@ -494,17 +494,39 @@ async function seedCustomers(tenantId: string) {
   console.log('🌱 Seeding customers...');
 
   for (const customerData of SAMPLE_CUSTOMERS) {
+    const { companyName, status, ...customerFields } = customerData;
+
+    // Create or get company
+    let company = await prisma.company.findFirst({
+      where: {
+        tenantId,
+        name: companyName,
+      },
+    });
+
+    if (!company) {
+      company = await prisma.company.create({
+        data: {
+          tenantId,
+          name: companyName,
+          active: true,
+        },
+      });
+    }
+
+    // Create customer linked to company
     await prisma.customer.upsert({
       where: {
         tenantId_accountNumber: {
           tenantId,
-          accountNumber: customerData.accountNumber!,
+          accountNumber: customerFields.accountNumber!,
         },
       },
       update: {},
       create: {
-        ...customerData,
+        ...customerFields,
         tenantId,
+        companyId: company.id,
       },
     });
   }
