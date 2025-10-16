@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { PortalProviders } from '@/components/providers/PortalProviders';
 import { PortalLayout } from '@/components/portal/layout/PortalLayout';
+import { PortalAuthGuard } from '@/components/auth/PortalAuthGuard';
 
 /**
  * Portal Layout
@@ -22,7 +23,9 @@ interface PortalLayoutWrapperProps {
 export default function PortalLayoutWrapper({ children }: PortalLayoutWrapperProps) {
   return (
     <PortalProviders>
-      <PortalLayout>{children}</PortalLayout>
+      <PortalAuthGuard redirectTo="/login">
+        <PortalLayout>{children}</PortalLayout>
+      </PortalAuthGuard>
     </PortalProviders>
   );
 }

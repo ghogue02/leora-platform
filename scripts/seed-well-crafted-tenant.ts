@@ -14,9 +14,12 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
-import * as crypto from 'crypto';
+import { hashSync } from 'bcryptjs';
 
 const prisma = new PrismaClient();
+
+const DEFAULT_PORTAL_PASSWORD =
+  process.env.DEFAULT_PORTAL_PASSWORD || 'LeoraDemo!2025';
 
 // ============================================================================
 // SEED DATA DEFINITIONS
@@ -59,32 +62,23 @@ const SYSTEM_ROLES = [
   },
 ];
 
-// System permissions
+// System permissions (aligned with RBAC categories)
 const SYSTEM_PERMISSIONS = [
-  // Product permissions
-  { resource: 'products', action: 'view', name: 'products.view', displayName: 'View Products' },
-  { resource: 'products', action: 'create', name: 'products.create', displayName: 'Create Products' },
-  { resource: 'products', action: 'update', name: 'products.update', displayName: 'Update Products' },
-  { resource: 'products', action: 'delete', name: 'products.delete', displayName: 'Delete Products' },
-
-  // Order permissions
-  { resource: 'orders', action: 'view', name: 'orders.view', displayName: 'View Orders' },
-  { resource: 'orders', action: 'create', name: 'orders.create', displayName: 'Create Orders' },
-  { resource: 'orders', action: 'update', name: 'orders.update', displayName: 'Update Orders' },
-  { resource: 'orders', action: 'cancel', name: 'orders.cancel', displayName: 'Cancel Orders' },
-
-  // Customer permissions
-  { resource: 'customers', action: 'view', name: 'customers.view', displayName: 'View Customers' },
-  { resource: 'customers', action: 'create', name: 'customers.create', displayName: 'Create Customers' },
-  { resource: 'customers', action: 'update', name: 'customers.update', displayName: 'Update Customers' },
-
-  // Portal permissions
   { resource: 'portal', action: 'access', name: 'portal.access', displayName: 'Access Portal' },
-  { resource: 'portal', action: 'cart', name: 'portal.cart', displayName: 'Use Cart' },
-  { resource: 'portal', action: 'favorites', name: 'portal.favorites', displayName: 'Manage Favorites' },
-  { resource: 'portal', action: 'reports', name: 'portal.reports', displayName: 'View Reports' },
+  { resource: 'portal', action: 'catalog.view', name: 'portal.catalog.view', displayName: 'View Catalog' },
+  { resource: 'portal', action: 'orders.view', name: 'portal.orders.view', displayName: 'View Orders' },
+  { resource: 'portal', action: 'orders.create', name: 'portal.orders.create', displayName: 'Create Orders' },
+  { resource: 'portal', action: 'cart.manage', name: 'portal.cart.manage', displayName: 'Manage Cart' },
+  { resource: 'portal', action: 'favorites.manage', name: 'portal.favorites.manage', displayName: 'Manage Favorites' },
+  { resource: 'portal', action: 'lists.manage', name: 'portal.lists.manage', displayName: 'Manage Lists' },
+  { resource: 'portal', action: 'insights.view', name: 'portal.insights.view', displayName: 'View Insights' },
+  { resource: 'portal', action: 'reports.view', name: 'portal.reports.view', displayName: 'View Reports' },
+  { resource: 'portal', action: 'reports.export', name: 'portal.reports.export', displayName: 'Export Reports' },
+  { resource: 'portal', action: 'notifications.view', name: 'portal.notifications.view', displayName: 'View Notifications' },
 
-  // Analytics permissions
+  { resource: 'catalog', action: 'products.manage', name: 'catalog.products.manage', displayName: 'Manage Products' },
+  { resource: 'orders', action: 'manage', name: 'orders.manage', displayName: 'Manage Orders' },
+  { resource: 'customers', action: 'manage', name: 'customers.manage', displayName: 'Manage Customers' },
   { resource: 'analytics', action: 'view', name: 'analytics.view', displayName: 'View Analytics' },
   { resource: 'analytics', action: 'export', name: 'analytics.export', displayName: 'Export Analytics' },
 ];
@@ -103,6 +97,8 @@ const SAMPLE_PRODUCTS = [
     alcoholType: 'WINE' as const,
     alcoholPercent: 14.5,
     status: 'ACTIVE' as const,
+    basePrice: 58.0,
+    initialInventory: 180,
   },
   {
     sku: 'WC-CHARD-001',
@@ -116,6 +112,8 @@ const SAMPLE_PRODUCTS = [
     alcoholType: 'WINE' as const,
     alcoholPercent: 13.5,
     status: 'ACTIVE' as const,
+    basePrice: 34.0,
+    initialInventory: 220,
   },
   {
     sku: 'WC-PINOT-001',
@@ -129,6 +127,8 @@ const SAMPLE_PRODUCTS = [
     alcoholType: 'WINE' as const,
     alcoholPercent: 13.0,
     status: 'ACTIVE' as const,
+    basePrice: 49.5,
+    initialInventory: 160,
   },
 ];
 
@@ -267,38 +267,57 @@ async function seedRolesAndPermissions() {
 function getPermissionsForRole(roleName: string): string[] {
   switch (roleName) {
     case 'admin':
-      return SYSTEM_PERMISSIONS.map(p => p.name);
+      return SYSTEM_PERMISSIONS.map((p) => p.name);
     case 'sales_manager':
       return [
-        'products.view',
-        'orders.view', 'orders.create', 'orders.update', 'orders.cancel',
-        'customers.view', 'customers.create', 'customers.update',
-        'analytics.view', 'analytics.export',
+        'portal.access',
+        'portal.catalog.view',
+        'portal.orders.view',
+        'portal.orders.create',
+        'portal.insights.view',
+        'portal.reports.view',
+        'portal.reports.export',
+        'portal.notifications.view',
+        'catalog.products.manage',
+        'orders.manage',
+        'customers.manage',
+        'analytics.view',
+        'analytics.export',
       ];
     case 'sales_rep':
       return [
-        'products.view',
-        'orders.view', 'orders.create',
-        'customers.view',
-        'analytics.view',
+        'portal.access',
+        'portal.catalog.view',
+        'portal.orders.view',
+        'portal.orders.create',
+        'portal.insights.view',
+        'portal.reports.view',
+        'portal.notifications.view',
       ];
     case 'portal_admin':
       return [
         'portal.access',
-        'portal.cart',
-        'portal.favorites',
-        'portal.reports',
-        'products.view',
-        'orders.view', 'orders.create',
-        'analytics.view',
+        'portal.catalog.view',
+        'portal.orders.view',
+        'portal.orders.create',
+        'portal.cart.manage',
+        'portal.favorites.manage',
+        'portal.lists.manage',
+        'portal.reports.view',
+        'portal.reports.export',
+        'portal.notifications.view',
+        'portal.insights.view',
       ];
     case 'portal_user':
       return [
         'portal.access',
-        'portal.cart',
-        'portal.favorites',
-        'products.view',
-        'orders.view', 'orders.create',
+        'portal.catalog.view',
+        'portal.orders.view',
+        'portal.orders.create',
+        'portal.cart.manage',
+        'portal.favorites.manage',
+        'portal.insights.view',
+        'portal.reports.view',
       ];
     default:
       return [];
@@ -309,19 +328,64 @@ async function seedProducts(tenantId: string) {
   console.log('🌱 Seeding products...');
 
   for (const productData of SAMPLE_PRODUCTS) {
-    await prisma.product.upsert({
+    const { basePrice, initialInventory, ...productInput } = productData;
+
+    const product = await prisma.product.upsert({
       where: {
         tenantId_sku: {
           tenantId,
-          sku: productData.sku,
+          sku: productInput.sku,
         },
       },
-      update: {},
+      update: {
+        status: productInput.status,
+        description: productInput.description,
+      },
       create: {
-        ...productData,
+        ...productInput,
         tenantId,
       },
     });
+
+    const existingSku = await prisma.sku.findFirst({
+      where: {
+        tenantId,
+        productId: product.id,
+      },
+    });
+
+    if (!existingSku) {
+      await prisma.sku.create({
+        data: {
+          tenantId,
+          productId: product.id,
+          skuCode: `${productInput.sku}-CS`,
+          variantName: 'Case (12x750ml)',
+          caseQuantity: 12,
+          basePrice,
+          status: 'ACTIVE',
+        },
+      });
+    }
+
+    const existingInventory = await prisma.inventory.findFirst({
+      where: {
+        tenantId,
+        productId: product.id,
+      },
+    });
+
+    if (!existingInventory) {
+      await prisma.inventory.create({
+        data: {
+          tenantId,
+          productId: product.id,
+          warehouseLocation: 'Main Warehouse',
+          quantityOnHand: initialInventory,
+          quantityAvailable: initialInventory,
+        },
+      });
+    }
   }
   console.log(`✅ Created ${SAMPLE_PRODUCTS.length} products`);
 }
@@ -359,6 +423,9 @@ async function seedPortalUsers(tenantId: string) {
     return;
   }
 
+  const passwordHash = hashSync(DEFAULT_PORTAL_PASSWORD, 10);
+  console.log(`ℹ️  Portal user default password: ${DEFAULT_PORTAL_PASSWORD}`);
+
   const customers = await prisma.customer.findMany({
     where: { tenantId },
   });
@@ -385,6 +452,7 @@ async function seedPortalUsers(tenantId: string) {
         status: 'ACTIVE',
         emailVerified: true,
         emailVerifiedAt: new Date(),
+        passwordHash,
         roleAssignments: {
           create: {
             roleId: portalRole.id,
@@ -401,12 +469,20 @@ async function seedDemoData(tenantId: string) {
 
   const customers = await prisma.customer.findMany({
     where: { tenantId },
-    take: 2,
   });
 
   const products = await prisma.product.findMany({
     where: { tenantId },
-    take: 2,
+    include: {
+      skus: {
+        orderBy: { createdAt: 'asc' },
+        take: 1,
+      },
+    },
+  });
+
+  const portalUser = await prisma.portalUser.findFirst({
+    where: { tenantId },
   });
 
   if (customers.length === 0 || products.length === 0) {
@@ -414,67 +490,235 @@ async function seedDemoData(tenantId: string) {
     return;
   }
 
-  // Create sample order
-  const order = await prisma.order.create({
-    data: {
-      tenantId,
-      customerId: customers[0].id,
-      orderNumber: `ORD-${Date.now()}`,
-      status: 'DELIVERED',
-      orderDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-      actualDeliveryDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-      subtotal: 1200.00,
-      taxAmount: 108.00,
-      shippingAmount: 0,
-      discountAmount: 0,
-      totalAmount: 1308.00,
-      currency: 'USD',
-      lines: {
-        create: [
-          {
-            productId: products[0].id,
-            lineNumber: 1,
-            quantity: 12,
-            unitPrice: 50.00,
-            subtotal: 600.00,
-            taxAmount: 54.00,
-            totalAmount: 654.00,
-          },
-          {
-            productId: products[1].id,
-            lineNumber: 2,
-            quantity: 12,
-            unitPrice: 50.00,
-            subtotal: 600.00,
-            taxAmount: 54.00,
-            totalAmount: 654.00,
-          },
-        ],
+  const now = new Date();
+  const taxRate = 0.09;
+
+  const orderConfigs = [
+    { status: 'DELIVERED', daysAgo: 30, deliveredDaysAgo: 25, customerIndex: 0 },
+    { status: 'IN_PROGRESS', daysAgo: 14, deliveredDaysAgo: null, customerIndex: 1 },
+    { status: 'PENDING', daysAgo: 3, deliveredDaysAgo: null, customerIndex: 0 },
+  ] as const;
+
+  let orderSequence = 1;
+
+  for (const config of orderConfigs) {
+    const customer = customers[config.customerIndex % customers.length];
+    const orderDate = new Date(now);
+    orderDate.setDate(orderDate.getDate() - config.daysAgo);
+
+    const actualDeliveryDate =
+      config.deliveredDaysAgo !== null
+        ? new Date(now.getTime() - config.deliveredDaysAgo * 24 * 60 * 60 * 1000)
+        : null;
+
+    const selectedProducts = products.slice(0, Math.min(products.length, 2));
+    const quantityPerLine = config.status === 'PENDING' ? 6 : 12;
+
+    const lines = selectedProducts.map((product, index) => {
+      const unitPrice = Number(product.skus[0]?.basePrice || 45);
+      const lineSubtotal = unitPrice * quantityPerLine;
+      const lineTax = lineSubtotal * taxRate;
+
+      return {
+        productId: product.id,
+        lineNumber: index + 1,
+        quantity: quantityPerLine,
+        unitPrice,
+        subtotal: Number(lineSubtotal.toFixed(2)),
+        taxAmount: Number(lineTax.toFixed(2)),
+        totalAmount: Number((lineSubtotal + lineTax).toFixed(2)),
+      };
+    });
+
+    const subtotal = lines.reduce((sum, line) => sum + line.subtotal, 0);
+    const taxAmount = lines.reduce((sum, line) => sum + line.taxAmount, 0);
+    const totalAmount = subtotal + taxAmount;
+
+    const orderNumber = `ORD-${new Date()
+      .toISOString()
+      .slice(0, 10)
+      .replace(/-/g, '')}-${orderSequence.toString().padStart(3, '0')}`;
+    orderSequence += 1;
+
+    const order = await prisma.order.create({
+      data: {
+        tenantId,
+        customerId: customer.id,
+        portalUserId: portalUser?.id ?? null,
+        orderNumber,
+        status: config.status,
+        orderDate,
+        requestedDeliveryDate: new Date(orderDate.getTime() + 3 * 24 * 60 * 60 * 1000),
+        actualDeliveryDate,
+        subtotal: Number(subtotal.toFixed(2)),
+        taxAmount: Number(taxAmount.toFixed(2)),
+        shippingAmount: 0,
+        discountAmount: 0,
+        totalAmount: Number(totalAmount.toFixed(2)),
+        currency: 'USD',
+        lines: {
+          create: lines,
+        },
       },
-    },
+    });
+
+    if (config.status === 'DELIVERED') {
+      await prisma.invoice.create({
+        data: {
+          tenantId,
+          customerId: customer.id,
+          orderId: order.id,
+          invoiceNumber: orderNumber.replace('ORD', 'INV'),
+          status: 'PAID',
+          invoiceDate: actualDeliveryDate ?? orderDate,
+          dueDate: new Date(orderDate.getTime() + 20 * 24 * 60 * 60 * 1000),
+          paidDate: new Date(orderDate.getTime() + 25 * 24 * 60 * 60 * 1000),
+          subtotal: Number(subtotal.toFixed(2)),
+          taxAmount: Number(taxAmount.toFixed(2)),
+          totalAmount: Number(totalAmount.toFixed(2)),
+          paidAmount: Number(totalAmount.toFixed(2)),
+          balanceDue: 0,
+          currency: 'USD',
+        },
+      });
+    }
+  }
+
+  console.log('✅ Created demo orders and invoices');
+}
+
+async function seedPortalUserAssets(tenantId: string) {
+  console.log('🌱 Seeding portal user favorites, templates, and notifications...');
+
+  const portalUser = await prisma.portalUser.findFirst({
+    where: { tenantId },
+    orderBy: { createdAt: 'asc' },
   });
 
-  // Create sample invoice
-  await prisma.invoice.create({
-    data: {
+  if (!portalUser) {
+    console.log('⚠️  Skipping portal user assets: no portal users found');
+    return;
+  }
+
+  const products = await prisma.product.findMany({
+    where: { tenantId },
+    orderBy: { createdAt: 'asc' },
+    take: 3,
+  });
+
+  if (products.length === 0) {
+    console.log('⚠️  Skipping favorites/templates seeding: no products found');
+  } else {
+    let favoritesList = await prisma.list.findFirst({
+      where: {
+        tenantId,
+        portalUserId: portalUser.id,
+        isDefault: true,
+      },
+    });
+
+    if (!favoritesList) {
+      favoritesList = await prisma.list.create({
+        data: {
+          tenantId,
+          portalUserId: portalUser.id,
+          name: 'Favorites',
+          description: 'Saved favorite products',
+          isDefault: true,
+        },
+      });
+    }
+
+    const existingFavorites = await prisma.listItem.count({
+      where: { listId: favoritesList.id },
+    });
+
+    if (existingFavorites === 0) {
+      await prisma.listItem.createMany({
+        data: products.slice(0, 2).map((product, index) => ({
+          listId: favoritesList!.id,
+          productId: product.id,
+          sortOrder: index,
+        })),
+      });
+    }
+
+    const existingTemplate = await prisma.list.findFirst({
+      where: {
+        tenantId,
+        portalUserId: portalUser.id,
+        isDefault: false,
+        name: 'Weekly Restock Template',
+      },
+    });
+
+    if (!existingTemplate) {
+      await prisma.list.create({
+        data: {
+          tenantId,
+          portalUserId: portalUser.id,
+          name: 'Weekly Restock Template',
+          description: 'Baseline restock order for top movers',
+          isDefault: false,
+          isShared: false,
+          items: {
+            create: products.map((product, index) => ({
+              productId: product.id,
+              sortOrder: index,
+              notes: JSON.stringify({ quantity: index === 0 ? 6 : 3 }),
+            })),
+          },
+        },
+      });
+    }
+  }
+
+  const referenceOrder = await prisma.order.findFirst({
+    where: { tenantId },
+    orderBy: { orderDate: 'desc' },
+  });
+
+  const existingNotifications = await prisma.notification.count({
+    where: {
       tenantId,
-      customerId: customers[0].id,
-      orderId: order.id,
-      invoiceNumber: `INV-${Date.now()}`,
-      status: 'PAID',
-      invoiceDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-      dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-      paidDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      subtotal: 1200.00,
-      taxAmount: 108.00,
-      totalAmount: 1308.00,
-      paidAmount: 1308.00,
-      balanceDue: 0,
-      currency: 'USD',
+      portalUserId: portalUser.id,
     },
   });
 
-  console.log('✅ Created demo order and invoice');
+  if (existingNotifications === 0) {
+    await prisma.notification.createMany({
+      data: [
+        {
+          tenantId,
+          portalUserId: portalUser.id,
+          type: 'order_update',
+          title: referenceOrder
+            ? `Order ${referenceOrder.orderNumber} delivered`
+            : 'Order delivered',
+          message: referenceOrder
+            ? `Order ${referenceOrder.orderNumber} has been delivered.`
+            : 'A recent order has been delivered.',
+          priority: 'NORMAL',
+          isRead: false,
+          metadata: referenceOrder
+            ? { orderId: referenceOrder.id, orderNumber: referenceOrder.orderNumber }
+            : Prisma.JsonNull,
+        },
+        {
+          tenantId,
+          portalUserId: portalUser.id,
+          type: 'product_alert',
+          title: 'Top product back in stock',
+          message: 'Your favorite catalog item is available again.',
+          priority: 'HIGH',
+          isRead: false,
+          metadata: products[0] ? { productId: products[0].id } : Prisma.JsonNull,
+        },
+      ],
+    });
+  }
+
+  console.log('✅ Portal user favorites, templates, and notifications seeded');
 }
 
 // ============================================================================
@@ -491,6 +735,7 @@ async function main() {
     await seedProducts(tenant.id);
     await seedCustomers(tenant.id);
     await seedPortalUsers(tenant.id);
+    await seedPortalUserAssets(tenant.id);
     await seedDemoData(tenant.id);
 
     console.log('\n✅ Seed completed successfully!');

@@ -15,12 +15,16 @@ import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 
 // Environment configuration
-const JWT_SECRET = process.env.JWT_SECRET || '';
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
+const JWT_SECRET = process.env.JWT_SECRET;
+const secret = JWT_SECRET ? new TextEncoder().encode(JWT_SECRET) : null;
 
-const secret = new TextEncoder().encode(JWT_SECRET);
+function getSecret(): Uint8Array {
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+
+  return secret;
+}
 
 // Token lifetimes
 export const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
@@ -67,6 +71,8 @@ export async function generateAccessToken(
   user: TokenUser,
   sessionId?: string
 ): Promise<string> {
+  const signingKey = getSecret();
+
   const payload: TokenPayload = {
     userId: user.id,
     portalUserId: user.portalUserId,
@@ -85,7 +91,7 @@ export async function generateAccessToken(
     .setExpirationTime(ACCESS_TOKEN_EXPIRY)
     .setIssuer('leora-platform')
     .setAudience('leora-portal')
-    .sign(secret);
+    .sign(signingKey);
 }
 
 /**
@@ -95,6 +101,8 @@ export async function generateRefreshToken(
   user: TokenUser,
   sessionId?: string
 ): Promise<string> {
+  const signingKey = getSecret();
+
   const payload: TokenPayload = {
     userId: user.id,
     portalUserId: user.portalUserId,
@@ -113,7 +121,7 @@ export async function generateRefreshToken(
     .setExpirationTime(REFRESH_TOKEN_EXPIRY)
     .setIssuer('leora-platform')
     .setAudience('leora-portal')
-    .sign(secret);
+    .sign(signingKey);
 }
 
 /**
@@ -121,7 +129,9 @@ export async function generateRefreshToken(
  */
 export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret, {
+    const signingKey = getSecret();
+
+    const { payload } = await jwtVerify(token, signingKey, {
       issuer: 'leora-platform',
       audience: 'leora-portal',
     });

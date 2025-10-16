@@ -9,6 +9,7 @@ import { NextRequest } from 'next/server';
 import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requirePermission } from '@/app/api/_utils/auth';
+import { withTenant } from '@/lib/prisma';
 
 interface RouteContext {
   params: Promise<{
@@ -27,54 +28,113 @@ export async function GET(
     const { id } = await params;
 
     // RBAC: Require permission to read orders
-    const user = await requirePermission(request, 'portal.orders.read');
+    const user = await requirePermission(request, 'portal.orders.view');
 
     // Tenant isolation
     const tenant = await requireTenant(request);
 
-    // TODO: Implement Prisma query
-    // SELECT * FROM orders WHERE id = id AND tenantId = tenant.tenantId
-    // If user has customerId, also filter by customerId
-
-    const order = {
-      id,
-      orderNumber: 'ORD-001',
-      customerId: user.customerId || 'customer-1',
-      customerName: 'Demo Customer',
-      status: 'pending',
-      totalAmount: 299.99,
-      subtotal: 270.99,
-      tax: 24.00,
-      shipping: 5.00,
-      lines: [
-        {
-          id: 'line-1',
-          productId: 'prod-1',
-          productName: 'Sample Product',
-          skuId: 'sku-1',
-          quantity: 3,
-          unitPrice: 29.99,
-          totalPrice: 89.97,
+    const order = await withTenant(tenant.tenantId, async (tx) => {
+      return tx.order.findFirst({
+        where: {
+          id,
+          tenantId: tenant.tenantId,
+          ...(user.customerId ? { customerId: user.customerId } : {}),
         },
-      ],
-      shippingAddress: {
-        street: '123 Main St',
-        city: 'Seattle',
-        state: 'WA',
-        zip: '98101',
-      },
-      notes: 'Sample order',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      requestedDeliveryDate: null,
-      actualDeliveryDate: null,
-    };
+        include: {
+          customer: {
+            select: {
+              companyName: true,
+            },
+          },
+          lines: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  sku: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
 
     if (!order) {
       return Errors.notFound('Order not found');
     }
 
-    return successResponse(order);
+    const shippingAddressRaw = order.shippingAddress as Record<string, unknown> | null;
+    let shippingAddress: { street: string; city: string; state: string; zip: string } | null =
+      null;
+
+    if (shippingAddressRaw && typeof shippingAddressRaw === 'object') {
+      const shippingObject = shippingAddressRaw as Record<string, unknown>;
+
+      const getValue = (key: string, fallbackKeys: string[] = []): string => {
+        if (shippingObject[key] !== undefined && shippingObject[key] !== null) {
+          return String(shippingObject[key]);
+        }
+        for (const altKey of fallbackKeys) {
+          if (shippingObject[altKey] !== undefined && shippingObject[altKey] !== null) {
+            return String(shippingObject[altKey]);
+          }
+        }
+        return '';
+      };
+
+      shippingAddress = {
+        street: getValue('street', ['line1', 'addressLine1']),
+        city: getValue('city'),
+        state: getValue('state', ['region', 'province']),
+        zip: getValue('zip', ['postalCode', 'zipCode']),
+      };
+
+      if (
+        !shippingAddress.street &&
+        !shippingAddress.city &&
+        !shippingAddress.state &&
+        !shippingAddress.zip
+      ) {
+        shippingAddress = null;
+      }
+    }
+
+    const lines = order.lines.map((line) => ({
+      id: line.id,
+      productId: line.productId,
+      productName: line.product?.name || 'Unknown Product',
+      skuId: line.product?.sku || null,
+      quantity: line.quantity,
+      unitPrice: Number(line.unitPrice),
+      totalPrice: Number(line.totalAmount),
+    }));
+
+    const formattedOrder = {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      customerId: order.customerId,
+      customerName: order.customer?.companyName || 'Unknown Customer',
+      status: order.status.toLowerCase(),
+      totalAmount: Number(order.totalAmount),
+      subtotal: Number(order.subtotal),
+      tax: Number(order.taxAmount),
+      shipping: Number(order.shippingAmount),
+      lines,
+      shippingAddress,
+      notes: order.notes,
+      createdAt: order.createdAt.toISOString(),
+      updatedAt: order.updatedAt.toISOString(),
+      requestedDeliveryDate: order.requestedDeliveryDate
+        ? order.requestedDeliveryDate.toISOString()
+        : null,
+      actualDeliveryDate: order.actualDeliveryDate
+        ? order.actualDeliveryDate.toISOString()
+        : null,
+    };
+
+    return successResponse(formattedOrder);
   } catch (error) {
     console.error('Error fetching order:', error);
 

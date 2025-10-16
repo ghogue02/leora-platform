@@ -6,10 +6,112 @@
  */
 
 import { NextRequest } from 'next/server';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requireAuth } from '@/app/api/_utils/auth';
 import { addFavoriteSchema } from '@/lib/validations/portal';
+import { withTenant } from '@/lib/prisma';
+
+type FavoritesList = Prisma.ListGetPayload<{
+  include: {
+    items: {
+      include: {
+        product: {
+          select: {
+            id: true;
+            name: true;
+            description: true;
+            category: true;
+            imageUrl: true;
+            status: true;
+            skus: {
+              select: {
+                basePrice: true;
+              };
+              take: 1;
+            };
+          };
+        };
+      };
+    };
+  };
+}>;
+
+async function getOrCreateFavoritesListTx(
+  tx: PrismaClient,
+  tenantId: string,
+  portalUserId: string
+): Promise<FavoritesList> {
+  const existing = await tx.list.findFirst({
+    where: {
+      tenantId,
+      portalUserId,
+      isDefault: true,
+    },
+    include: {
+      items: {
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              category: true,
+              imageUrl: true,
+              status: true,
+              skus: {
+                select: {
+                  basePrice: true,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
+  return tx.list.create({
+    data: {
+      tenantId,
+      portalUserId,
+      name: 'Favorites',
+      description: 'Saved favorite products',
+      isDefault: true,
+    },
+    include: {
+      items: {
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              category: true,
+              imageUrl: true,
+              status: true,
+              skus: {
+                select: {
+                  basePrice: true,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
 
 /**
  * List user favorites
@@ -19,22 +121,23 @@ export async function GET(request: NextRequest) {
     const user = await requireAuth(request);
     const tenant = await requireTenant(request);
 
-    // TODO: Implement with Prisma
-    // SELECT products WHERE id IN (SELECT productId FROM favorites WHERE userId = user.id)
+    const list = await withTenant(tenant.tenantId, (tx) =>
+      getOrCreateFavoritesListTx(tx, tenant.tenantId, user.id)
+    );
 
-    const favorites = [
-      {
-        id: 'fav-1',
-        productId: 'prod-1',
-        product: {
-          id: 'prod-1',
-          name: 'Favorite Product',
-          price: 29.99,
-          imageUrl: null,
-        },
-        addedAt: new Date().toISOString(),
-      },
-    ];
+    const favorites = list.items.map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.product?.name ?? 'Unknown Product',
+      productDescription: item.product?.description ?? null,
+      category: item.product?.category ?? null,
+      price: item.product?.skus?.[0]
+        ? Number(item.product.skus[0].basePrice)
+        : null,
+      imageUrl: item.product?.imageUrl ?? null,
+      status: item.product?.status ?? null,
+      addedAt: item.createdAt.toISOString(),
+    }));
 
     return successResponse({
       favorites,
@@ -71,24 +174,107 @@ export async function POST(request: NextRequest) {
 
     const { productId } = validatedBody.data;
 
-    // TODO: Implement with Prisma
-    // 1. Verify product exists
-    // 2. Check if already favorited
-    // 3. Create favorite record
+    const favorite = await withTenant(tenant.tenantId, async (tx) => {
+      const product = await tx.product.findFirst({
+        where: {
+          id: productId,
+          tenantId: tenant.tenantId,
+          status: 'ACTIVE',
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          category: true,
+          imageUrl: true,
+          status: true,
+          skus: {
+            select: {
+              basePrice: true,
+            },
+            take: 1,
+          },
+        },
+      });
 
-    const favorite = {
-      id: 'fav-new',
-      userId: user.id,
-      productId,
-      addedAt: new Date().toISOString(),
-    };
+      if (!product) {
+        throw new Error('Product not found');
+      }
 
-    return successResponse(favorite, 201);
+      const list = await getOrCreateFavoritesListTx(tx, tenant.tenantId, user.id);
+
+      const existingItem = await tx.listItem.findFirst({
+        where: {
+          listId: list.id,
+          productId,
+        },
+      });
+
+      if (existingItem) {
+        return {
+          id: existingItem.id,
+          product,
+          createdAt: existingItem.createdAt,
+        };
+      }
+
+      const createdItem = await tx.listItem.create({
+        data: {
+          listId: list.id,
+          productId,
+        },
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              category: true,
+              imageUrl: true,
+              status: true,
+              skus: {
+                select: {
+                  basePrice: true,
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        id: createdItem.id,
+        product: createdItem.product,
+        createdAt: createdItem.createdAt,
+      };
+    });
+
+    return successResponse(
+      {
+        id: favorite.id,
+        productId,
+        productName: favorite.product?.name ?? 'Unknown Product',
+        productDescription: favorite.product?.description ?? null,
+        category: favorite.product?.category ?? null,
+        price: favorite.product?.skus?.[0]
+          ? Number(favorite.product.skus[0].basePrice)
+          : null,
+        imageUrl: favorite.product?.imageUrl ?? null,
+        status: favorite.product?.status ?? null,
+        addedAt: favorite.createdAt.toISOString(),
+      },
+      201
+    );
   } catch (error) {
     console.error('Error adding favorite:', error);
 
     if (error instanceof Error && error.message === 'Authentication required') {
       return Errors.unauthorized();
+    }
+
+    if (error instanceof Error && error.message === 'Product not found') {
+      return Errors.notFound('Product not found');
     }
 
     return Errors.serverError('Failed to add favorite');
@@ -110,8 +296,24 @@ export async function DELETE(request: NextRequest) {
       return Errors.badRequest('Product ID is required');
     }
 
-    // TODO: Implement with Prisma
-    // DELETE FROM favorites WHERE userId = user.id AND productId = productId
+    await withTenant(tenant.tenantId, async (tx) => {
+      const list = await getOrCreateFavoritesListTx(tx, tenant.tenantId, user.id);
+
+      const existingItem = await tx.listItem.findFirst({
+        where: {
+          listId: list.id,
+          productId,
+        },
+      });
+
+      if (!existingItem) {
+        return;
+      }
+
+      await tx.listItem.delete({
+        where: { id: existingItem.id },
+      });
+    });
 
     return successResponse({
       removed: true,

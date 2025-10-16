@@ -148,7 +148,7 @@ describe('Tenant Utilities', () => {
 
   describe('withTenantContext', () => {
     it('should execute callback with tenant context', async () => {
-      const callback = jest.fn(async (ctx) => {
+      const callback = jest.fn(async (ctx: { tenantId: string }) => {
         expect(ctx.tenantId).toBe('tenant-123');
         return 'success';
       });
@@ -162,7 +162,7 @@ describe('Tenant Utilities', () => {
     it('should pass tenant ID to callback', async () => {
       let capturedTenantId: string | null = null;
 
-      await utils.withTenantContext('my-tenant', async (ctx) => {
+      await utils.withTenantContext('my-tenant', async (ctx: { tenantId: string }) => {
         capturedTenantId = ctx.tenantId;
         return true;
       });

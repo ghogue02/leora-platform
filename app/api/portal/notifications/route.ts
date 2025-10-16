@@ -10,6 +10,7 @@ import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requireAuth } from '@/app/api/_utils/auth';
 import { notificationFilterSchema, markNotificationReadSchema } from '@/lib/validations/portal';
+import { withTenant } from '@/lib/prisma';
 
 /**
  * Get user notifications
@@ -34,45 +35,61 @@ export async function GET(request: NextRequest) {
 
     const { read, type, page, limit } = validatedParams.data;
 
-    // TODO: Implement with Prisma
-    // SELECT notifications WHERE userId = user.id AND filters
+    const { notifications, total, unreadCount } = await withTenant(
+      tenant.tenantId,
+      async (tx) => {
+        const where = {
+          tenantId: tenant.tenantId,
+          portalUserId: user.id,
+          ...(typeof read === 'boolean' ? { isRead: read } : {}),
+          ...(type ? { type } : {}),
+        };
 
-    const notifications = [
-      {
-        id: 'notif-1',
-        type: 'order_update',
-        title: 'Order Shipped',
-        message: 'Your order ORD-001 has been shipped',
-        read: false,
-        createdAt: new Date().toISOString(),
-        data: {
-          orderId: 'order-1',
-          orderNumber: 'ORD-001',
-        },
-      },
-      {
-        id: 'notif-2',
-        type: 'product_alert',
-        title: 'Back in Stock',
-        message: 'Your favorite product is back in stock',
-        read: true,
-        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        data: {
-          productId: 'prod-1',
-        },
-      },
-    ];
+        const [records, totalCount, unreadTotal] = await Promise.all([
+          tx.notification.findMany({
+            where,
+            orderBy: {
+              createdAt: 'desc',
+            },
+            take: limit,
+            skip: (page - 1) * limit,
+          }),
+          tx.notification.count({ where }),
+          tx.notification.count({
+            where: {
+              tenantId: tenant.tenantId,
+              portalUserId: user.id,
+              isRead: false,
+            },
+          }),
+        ]);
 
-    const total = notifications.length;
-    const unreadCount = notifications.filter(n => !n.read).length;
+        return {
+          notifications: records,
+          total: totalCount,
+          unreadCount: unreadTotal,
+        };
+      }
+    );
 
     return successResponse({
-      notifications,
+      notifications: notifications.map((notification) => ({
+        id: notification.id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        priority: notification.priority,
+        read: notification.isRead,
+        actionUrl: notification.actionUrl,
+        createdAt: notification.createdAt.toISOString(),
+        readAt: notification.readAt ? notification.readAt.toISOString() : null,
+        metadata: notification.metadata,
+      })),
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
       },
       unreadCount,
     });
@@ -107,20 +124,49 @@ export async function PATCH(request: NextRequest) {
 
     const { notificationId, read } = validatedBody.data;
 
-    // TODO: Implement with Prisma
-    // 1. Verify notification belongs to user
-    // 2. Update read status
+    const updateResult = await withTenant(tenant.tenantId, async (tx) => {
+      const notification = await tx.notification.findFirst({
+        where: {
+          tenantId: tenant.tenantId,
+          portalUserId: user.id,
+          id: notificationId,
+        },
+      });
+
+      if (!notification) {
+        throw new Error('Notification not found');
+      }
+
+      const timestamp = read ? new Date() : null;
+
+      const updated = await tx.notification.update({
+        where: { id: notificationId },
+        data: {
+          isRead: read,
+          readAt: timestamp,
+        },
+      });
+
+      return {
+        isRead: updated.isRead,
+        readAt: timestamp,
+      };
+    });
 
     return successResponse({
       notificationId,
-      read,
-      updatedAt: new Date().toISOString(),
+      read: updateResult.isRead,
+      readAt: updateResult.readAt ? updateResult.readAt.toISOString() : null,
     });
   } catch (error) {
     console.error('Error updating notification:', error);
 
     if (error instanceof Error && error.message === 'Authentication required') {
       return Errors.unauthorized();
+    }
+
+    if (error instanceof Error && error.message === 'Notification not found') {
+      return Errors.notFound(error.message);
     }
 
     return Errors.serverError('Failed to update notification');
@@ -142,9 +188,23 @@ export async function DELETE(request: NextRequest) {
       return Errors.badRequest('Notification ID is required');
     }
 
-    // TODO: Implement with Prisma
-    // 1. Verify notification belongs to user
-    // 2. Delete notification
+    await withTenant(tenant.tenantId, async (tx) => {
+      const notification = await tx.notification.findFirst({
+        where: {
+          tenantId: tenant.tenantId,
+          portalUserId: user.id,
+          id: notificationId,
+        },
+      });
+
+      if (!notification) {
+        throw new Error('Notification not found');
+      }
+
+      await tx.notification.delete({
+        where: { id: notificationId },
+      });
+    });
 
     return successResponse({
       deleted: true,
@@ -156,6 +216,10 @@ export async function DELETE(request: NextRequest) {
 
     if (error instanceof Error && error.message === 'Authentication required') {
       return Errors.unauthorized();
+    }
+
+    if (error instanceof Error && error.message === 'Notification not found') {
+      return Errors.notFound(error.message);
     }
 
     return Errors.serverError('Failed to delete notification');

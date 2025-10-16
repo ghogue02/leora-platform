@@ -10,6 +10,11 @@
 
 import { PrismaClient } from '@prisma/client';
 import type { NextRequest } from 'next/server';
+import {
+  ACCESS_TOKEN_COOKIE,
+  type TokenPayload,
+  verifyToken,
+} from '@/lib/auth/jwt';
 
 // Environment configuration
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -101,6 +106,15 @@ export async function withTenantFromRequest(
                    request.cookies.get('tenant-slug')?.value ||
                    DEFAULT_TENANT_SLUG;
 
+  // Prefer tenant from access token when available
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  if (accessToken) {
+    const payload = await verifyToken(accessToken);
+    if (payload?.type === 'access' && payload.tenantSlug) {
+      tenantSlug = payload.tenantSlug;
+    }
+  }
+
   // Resolve tenant from database
   const tenant = await prisma.tenant.findFirst({
     where: {
@@ -151,14 +165,33 @@ export async function withPortalUserFromRequest(
   // Get tenant context first
   const tenantContext = await withTenantFromRequest(request);
 
-  // Extract portal user from header or cookie
-  const portalUserEmail = request.headers.get('x-portal-user-email') ||
-                         request.headers.get('x-user-email') ||
-                         request.cookies.get('portal-user-email')?.value ||
-                         process.env.DEFAULT_PORTAL_USER_EMAIL;
+  // Attempt to resolve user from JWT access token
+  let portalUserId =
+    request.headers.get('x-portal-user-id') ||
+    request.cookies.get('portal-user-id')?.value;
+  let portalUserEmail =
+    request.headers.get('x-portal-user-email') ||
+    request.headers.get('x-user-email') ||
+    request.cookies.get('portal-user-email')?.value ||
+    process.env.DEFAULT_PORTAL_USER_EMAIL;
 
-  const portalUserId = request.headers.get('x-portal-user-id') ||
-                      request.cookies.get('portal-user-id')?.value;
+  let tokenPayload: TokenPayload | null = null;
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  if (accessToken) {
+    tokenPayload = await verifyToken(accessToken);
+    if (tokenPayload?.type === 'access') {
+      portalUserId = tokenPayload.portalUserId || portalUserId;
+      portalUserEmail = tokenPayload.email || portalUserEmail;
+
+      // Ensure tenant alignment (defensive)
+      if (
+        tokenPayload.tenantId &&
+        tokenPayload.tenantId !== tenantContext.tenantId
+      ) {
+        throw new Error('Tenant mismatch for authenticated user');
+      }
+    }
+  }
 
   if (!portalUserEmail && !portalUserId) {
     throw new Error('Portal user authentication required');

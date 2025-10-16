@@ -7,11 +7,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { compare } from 'bcryptjs';
+import { randomUUID } from 'crypto';
 import { loginSchema, type AuthResponse } from '@/lib/auth/types';
 import {
   generateTokenPair,
   setAuthCookies,
   type TokenUser,
+  REFRESH_TOKEN_MAX_AGE,
 } from '@/lib/auth/jwt';
 import {
   getSecurityStatus,
@@ -127,7 +129,30 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password (assuming user.passwordHash exists)
-    const passwordHash = (user as any).passwordHash || '';
+    const passwordHash = (user as any).passwordHash;
+    if (!passwordHash) {
+      const { lockoutStatus } = recordFailedLogin(ipIdentifier, emailIdentifier);
+
+      await logAuthActivity({
+        action: 'login_failed',
+        email,
+        tenantSlug,
+        ipAddress: clientIP,
+        userAgent,
+        success: false,
+        errorMessage: 'Account missing password hash',
+      });
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid email or password',
+          remainingAttempts: lockoutStatus.remainingAttempts,
+        },
+        { status: 401 }
+      );
+    }
+
     const isValidPassword = await compare(password, passwordHash);
 
     if (!isValidPassword) {
@@ -183,18 +208,6 @@ export async function POST(request: NextRequest) {
         ra.role.rolePermissions?.map((rp) => rp.permission.name)
       ) || getPermissionsForRoles(roles);
 
-    // Create session record
-    const session = await prisma.portalSession.create({
-      data: {
-        portalUserId: user.id,
-        accessToken: '', // Will be filled with access token
-        refreshToken: '', // Will be filled with refresh token
-        ipAddress: clientIP,
-        userAgent,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      },
-    });
-
     // Generate tokens
     const tokenUser: TokenUser = {
       id: (user as any).userId || user.id,
@@ -206,17 +219,24 @@ export async function POST(request: NextRequest) {
       permissions,
     };
 
+    const sessionId = randomUUID();
     const { accessToken, refreshToken } = await generateTokenPair(
       tokenUser,
-      session.id
+      sessionId
     );
 
-    // Update session with tokens
-    await prisma.portalSession.update({
-      where: { id: session.id },
+    const sessionExpiry = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE * 1000);
+
+    await prisma.portalSession.create({
       data: {
+        id: sessionId,
+        portalUserId: user.id,
         accessToken,
         refreshToken,
+        ipAddress: clientIP,
+        userAgent,
+        expiresAt: sessionExpiry,
+        refreshExpiresAt: sessionExpiry,
       },
     });
 
@@ -241,7 +261,7 @@ export async function POST(request: NextRequest) {
       userAgent,
       success: true,
       userId: user.id,
-      sessionId: session.id,
+      sessionId,
     });
 
     // Return user data
@@ -258,7 +278,7 @@ export async function POST(request: NextRequest) {
         tenantSlug: user.tenant?.slug || '',
         roles,
         permissions,
-        sessionId: session.id,
+        sessionId,
         emailVerified: (user as any).emailVerified || false,
         lastLoginAt: new Date(),
       },

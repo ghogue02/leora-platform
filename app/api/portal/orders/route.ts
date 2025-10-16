@@ -5,10 +5,11 @@
  */
 
 import { NextRequest } from 'next/server';
-import { successResponse, errorResponse, Errors } from '@/app/api/_utils/response';
+import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requirePermission } from '@/app/api/_utils/auth';
 import { orderFilterSchema, createOrderSchema } from '@/lib/validations/portal';
+import { withTenant } from '@/lib/prisma';
 
 /**
  * List orders with filters
@@ -16,7 +17,7 @@ import { orderFilterSchema, createOrderSchema } from '@/lib/validations/portal';
 export async function GET(request: NextRequest) {
   try {
     // RBAC: Require permission to read orders
-    const user = await requirePermission(request, 'portal.orders.read');
+    const user = await requirePermission(request, 'portal.orders.view');
 
     // Tenant isolation
     const tenant = await requireTenant(request);
@@ -45,37 +46,87 @@ export async function GET(request: NextRequest) {
       sortOrder,
     } = validatedParams.data;
 
-    // TODO: Implement Prisma query with filters
-    // Apply tenant isolation: WHERE tenantId = tenant.tenantId
-    // Apply user context: If user has customerId, filter by customerId
-    // Filter by status, date range, pagination
+    const allowedSortFields = new Set(['orderDate', 'createdAt', 'status', 'totalAmount']);
+    const sortField = sortBy && allowedSortFields.has(sortBy) ? sortBy : 'orderDate';
+    const sortDirection = sortOrder ?? 'desc';
 
-    const orders = [
-      {
-        id: '1',
-        orderNumber: 'ORD-001',
-        customerId: user.customerId || 'customer-1',
-        customerName: 'Demo Customer',
-        status: 'pending',
-        totalAmount: 299.99,
-        itemCount: 3,
-        createdAt: new Date().toISOString(),
-        deliveryDate: null,
-      },
-    ];
+    const statusFilter = status ? status.toUpperCase() : undefined;
 
-    const total = 1;
-    const totalPages = Math.ceil(total / limit);
+    const result = await withTenant(tenant.tenantId, async (tx) => {
+      const where: any = {
+        tenantId: tenant.tenantId,
+      };
 
-    return successResponse({
-      orders,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-      },
+      if (user.customerId) {
+        where.customerId = user.customerId;
+      } else if (customerId) {
+        where.customerId = customerId;
+      }
+
+      if (statusFilter) {
+        where.status = statusFilter;
+      }
+
+      if (startDate || endDate) {
+        where.orderDate = {};
+        if (startDate) {
+          where.orderDate.gte = new Date(startDate);
+        }
+        if (endDate) {
+          where.orderDate.lte = new Date(endDate);
+        }
+      }
+
+      const [orders, total] = await Promise.all([
+        tx.order.findMany({
+          where,
+          include: {
+            customer: {
+              select: {
+                companyName: true,
+              },
+            },
+            lines: {
+              select: {
+                quantity: true,
+              },
+            },
+          },
+          orderBy: {
+            [sortField]: sortDirection,
+          },
+          take: limit,
+          skip: (page - 1) * limit,
+        }),
+        tx.order.count({ where }),
+      ]);
+
+      const formatted = orders.map((order) => ({
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerId: order.customerId,
+        customerName: order.customer?.companyName || 'Unknown Customer',
+        status: order.status.toLowerCase(),
+        totalAmount: Number(order.totalAmount),
+        itemCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
+        createdAt: order.orderDate.toISOString(),
+        deliveryDate: order.actualDeliveryDate ? order.actualDeliveryDate.toISOString() : null,
+      }));
+
+      const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+
+      return {
+        orders: formatted,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      };
     });
+
+    return successResponse(result);
   } catch (error) {
     console.error('Error fetching orders:', error);
 

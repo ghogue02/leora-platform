@@ -12,7 +12,7 @@ import { productFilterSchema } from '@/lib/validations/portal';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requirePermission(request, 'portal.products.read');
+    const user = await requirePermission(request, 'portal.catalog.view');
     const tenant = await requireTenant(request);
 
     const { searchParams } = new URL(request.url);
@@ -63,7 +63,9 @@ export async function GET(request: NextRequest) {
       // Supplier filter
       if (supplier) {
         where.supplier = {
-          name: { contains: supplier, mode: 'insensitive' },
+          is: {
+            name: { contains: supplier, mode: 'insensitive' },
+          },
         };
       }
 
