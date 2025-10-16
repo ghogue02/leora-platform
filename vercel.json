@@ -85,14 +85,14 @@
   ],
   "redirects": [
     {
-      "source": "/login",
-      "destination": "/portal/auth/login",
-      "permanent": true
+      "source": "/portal",
+      "destination": "/dashboard",
+      "permanent": false
     },
     {
-      "source": "/signup",
-      "destination": "/portal/auth/register",
-      "permanent": true
+      "source": "/portal/dashboard",
+      "destination": "/dashboard",
+      "permanent": false
     }
   ],
   "build": {
