@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "supabase-postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "enhanced-postgres-mcp-server",
+        "postgresql://postgres:UHXGhJvhEPRGpL06@db.zqezunzlyjkseugujkrl.supabase.co:5432/postgres?sslmode=require"
+      ],
+      "type": "stdio",
+      "env": {
+        "POSTGRES_SSL": "true",
+        "POSTGRES_SSL_REJECT_UNAUTHORIZED": "false"
+      }
+    }
+  }
+}
