@@ -10,8 +10,7 @@ import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requireAuth } from '@/app/api/_utils/auth';
 import { withTenant } from '@/lib/prisma';
-import { addToCartSchema, updateCartItemSchema } from '@/lib/validations/portal';
-import { z } from 'zod';
+import { addToCartSchema, updateCartItemSchema, idSchema } from '@/lib/validations/portal';
 import { getPriceForProduct, updateCartTotals } from './implementation';
 
 /**
@@ -40,8 +39,11 @@ export async function POST(request: NextRequest) {
       });
 
       // Validate product exists and is active
-      const product = await tx.product.findUnique({
-        where: { id: productId },
+      const product = await tx.product.findFirst({
+        where: {
+          id: productId,
+          tenantId: tenant.tenantId,
+        },
         select: {
           id: true,
           name: true,
@@ -56,7 +58,10 @@ export async function POST(request: NextRequest) {
 
       // Check inventory availability
       const inventory = await tx.inventory.findFirst({
-        where: { productId },
+        where: {
+          productId,
+          tenantId: tenant.tenantId,
+        },
       });
 
       const availableInventory = inventory?.quantityAvailable || 0;
@@ -65,12 +70,18 @@ export async function POST(request: NextRequest) {
       }
 
       // Get pricing
-      const price = await getPriceForProduct(tx, productId, user.customerId || null);
+      const price = await getPriceForProduct(
+        tx,
+        tenant.tenantId,
+        productId,
+        user.customerId || null
+      );
 
       // Get or create cart
       let cart = await tx.cart.findFirst({
         where: {
           portalUserId: user.id,
+          tenantId: tenant.tenantId,
           status: 'ACTIVE',
         },
       });
@@ -180,7 +191,7 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
     const schema = updateCartItemSchema.extend({
-      itemId: z.string().uuid(),
+      itemId: idSchema,
     });
     const validatedBody = schema.safeParse(body);
 

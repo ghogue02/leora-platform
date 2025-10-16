@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart, useUpdateCartItem, useRemoveFromCart, useClearCart } from '@/lib/hooks/useCart';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -106,15 +107,21 @@ export default function CartPage() {
                       key={item.id}
                       className="flex gap-4 p-4 rounded-card border-2 border-border"
                     >
-                      <div className="h-20 w-20 bg-muted rounded-card flex items-center justify-center flex-shrink-0">
+                      <div className="h-20 w-20 flex-shrink-0">
                         {item.imageUrl ? (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.productName}
-                            className="h-full w-full object-cover rounded-card"
-                          />
+                          <div className="relative h-full w-full overflow-hidden rounded-card bg-muted">
+                            <Image
+                              src={item.imageUrl}
+                              alt={item.productName}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                            />
+                          </div>
                         ) : (
-                          <Package className="h-8 w-8 text-slate-400" />
+                          <div className="flex h-full w-full items-center justify-center rounded-card bg-muted">
+                            <Package className="h-8 w-8 text-slate-400" />
+                          </div>
                         )}
                       </div>
 

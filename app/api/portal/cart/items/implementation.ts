@@ -4,6 +4,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { computeCharges, resolveProductPrice } from '@/lib/services/pricing';
 
 /**
  * Get pricing for a product using waterfall logic
@@ -11,39 +12,14 @@ import { PrismaClient } from '@prisma/client';
  */
 export async function getPriceForProduct(
   tx: PrismaClient,
+  tenantId: string,
   productId: string,
   customerId: string | null
 ): Promise<number> {
-  // Try price list first
-  const priceListEntry = await tx.priceListEntry.findFirst({
-    where: {
-      productId,
-      OR: [
-        { validFrom: { lte: new Date() }, validUntil: { gte: new Date() } },
-        { validFrom: { lte: new Date() }, validUntil: null },
-        { validFrom: null, validUntil: { gte: new Date() } },
-        { validFrom: null, validUntil: null },
-      ],
-    },
-    orderBy: { createdAt: 'desc' },
+  const { price } = await resolveProductPrice(tx, tenantId, productId, {
+    customerId,
   });
-
-  if (priceListEntry) {
-    return Number(priceListEntry.unitPrice);
-  }
-
-  // Fall back to product SKU base price
-  const product = await tx.product.findUnique({
-    where: { id: productId },
-    include: {
-      skus: {
-        take: 1,
-        orderBy: { createdAt: 'asc' },
-      },
-    },
-  });
-
-  return Number(product?.skus[0]?.basePrice || 0);
+  return price;
 }
 
 /**
@@ -52,15 +28,16 @@ export async function getPriceForProduct(
 export async function updateCartTotals(
   tx: PrismaClient,
   cartId: string,
-  _tenantSettings?: Record<string, unknown> | null
+  tenantSettings?: Record<string, unknown> | null
 ): Promise<void> {
   const allItems = await tx.cartItem.findMany({
     where: { cartId },
   });
 
   const subtotal = allItems.reduce((sum, item) => sum + Number(item.subtotal), 0);
-  const tax = subtotal * 0.09; // Should come from tenant settings
-  const shipping = subtotal > 100 ? 0 : 5.0; // Free shipping over $100
+  const { taxAmount: tax, shippingAmount: shipping } = computeCharges(subtotal, {
+    tenantSettings,
+  });
   const total = subtotal + tax + shipping;
 
   await tx.cart.update({
