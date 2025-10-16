@@ -1,6 +1,10 @@
-// Leora Platform - Prisma Schema
+// Leora Platform - Prisma Schema (CORRECTED)
 // Multi-tenant SaaS for beverage alcohol distributors
 // Primary tenant: Well Crafted
+//
+// IMPORTANT: Database columns are in camelCase.
+// Column @map directives removed - they were mapping TO snake_case incorrectly.
+// Table @@map directives kept as-is.
 
 generator client {
   provider = "prisma-client-js"
@@ -990,12 +994,12 @@ model AccountHealthSnapshot {
   currentMonthRevenue Decimal @db.Decimal(10,2)
   averageMonthRevenue Decimal @db.Decimal(10,2)
   revenueDropPercent  Decimal? @db.Decimal(5,2)
-  revenueHealthStatus String  // healthy | at_risk | critical
+  revenueHealthStatus String //  healthy | at_risk | critical
 
   // Order pace (ARPDD)
   establishedPaceDays Decimal? @db.Decimal(5,2)
   daysSinceLastOrder  Int?
-  paceStatus          String  // on_track | at_risk | overdue
+  paceStatus          String //  on_track | at_risk | overdue
 
   // Sample usage
   samplePullsThisMonth Int     @default(0)

@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
       const rowCount = Number(countResult[0]?.count || 0);
 
       // Get sample data (first 3 rows)
-      let sampleData = [];
+      let sampleData: any[] = [];
       try {
-        sampleData = await prisma.$queryRawUnsafe(`SELECT * FROM "${tableName}" LIMIT 3`);
+        sampleData = await prisma.$queryRawUnsafe(`SELECT * FROM "${tableName}" LIMIT 3`) as any[];
       } catch (error) {
         console.log(`Could not fetch sample data from ${tableName}`);
       }
