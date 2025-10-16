@@ -14,16 +14,23 @@
 import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 
-// Environment configuration
-const JWT_SECRET = process.env.JWT_SECRET;
-const secret = JWT_SECRET ? new TextEncoder().encode(JWT_SECRET) : null;
+// Environment configuration - Runtime loading to ensure Next.js env vars are available
+let cachedSecret: Uint8Array | null = null;
 
 function getSecret(): Uint8Array {
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is required');
+  if (cachedSecret) return cachedSecret;
+
+  const JWT_SECRET = process.env.JWT_SECRET;
+
+  if (!JWT_SECRET) {
+    throw new Error(
+      'JWT_SECRET environment variable is required. ' +
+      'Ensure .env.local exists and restart the server.'
+    );
   }
 
-  return secret;
+  cachedSecret = new TextEncoder().encode(JWT_SECRET);
+  return cachedSecret;
 }
 
 // Token lifetimes

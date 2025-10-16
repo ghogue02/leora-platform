@@ -112,11 +112,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current roles and permissions
-    const roles = (user as any).roleAssignments?.map((ra: any) => ra.role.name) || ['portal_customer'];
+    if (!user.roleAssignments || user.roleAssignments.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Access denied: no roles assigned',
+          code: 'NO_ROLES',
+        },
+        { status: 403 }
+      );
+    }
+
+    const roles = (user as any).roleAssignments.map((ra: any) => ra.role.name);
     const permissions =
-      (user as any).roleAssignments?.flatMap((ra: any) =>
-        ra.role.rolePermissions?.map((rp: any) => rp.permission.name)
-      ) || getPermissionsForRoles(roles);
+      (user as any).roleAssignments.flatMap((ra: any) =>
+        ra.role.rolePermissions?.map((rp: any) => rp.permission.key)
+      ) || [];
 
     // Generate new access token with fresh permissions
     const tokenUser: TokenUser = {
