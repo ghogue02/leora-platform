@@ -358,6 +358,27 @@ async function autoProvisionPortalUser(
           roleId: portalRole.id,
         },
       },
+      // Attach first active customer as portfolio account when available
+      customer: {
+        connectOrCreate: {
+          where: {
+            tenantId_accountNumber: {
+              tenantId,
+              accountNumber: 'DEMO-ACCOUNT',
+            },
+          },
+          create: {
+            tenantId,
+            accountNumber: 'DEMO-ACCOUNT',
+            companyName: 'Harborview Cellars',
+            tradeName: 'Harborview Wine Shop',
+            primaryContactName: 'Sarah Johnson',
+            primaryContactEmail: email,
+            status: 'ACTIVE',
+            paymentTerms: 'NET30',
+          },
+        },
+      },
     },
     include: {
       roleAssignments: {
