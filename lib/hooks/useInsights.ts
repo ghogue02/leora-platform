@@ -48,6 +48,15 @@ export interface InsightsData {
     message: string;
     createdAt: string;
   }>;
+  recentOrders: Array<{
+    id: string;
+    orderDate: string;
+    totalAmount: number;
+    customerName: string;
+  }>;
+  totals: {
+    orders: number;
+  };
 }
 
 interface UseInsightsOptions {
