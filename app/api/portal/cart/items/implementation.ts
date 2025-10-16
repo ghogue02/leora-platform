@@ -34,7 +34,7 @@ export async function updateCartTotals(
     where: { cartId },
   });
 
-  const subtotal = allItems.reduce((sum, item) => sum + Number(item.subtotal), 0);
+  const subtotal = allItems.reduce((sum, item) => sum + Number(item.netPrice), 0);
   const { taxAmount: tax, shippingAmount: shipping } = computeCharges(subtotal, {
     tenantSettings,
   });

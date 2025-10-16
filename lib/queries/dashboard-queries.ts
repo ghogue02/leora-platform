@@ -78,7 +78,7 @@ export async function getAccountRevenueTrends(
     include: {
       lines: {
         select: {
-          subtotal: true,
+          netPrice: true,
         },
       },
     },
@@ -95,7 +95,7 @@ export async function getAccountRevenueTrends(
 
     const date = new Date(order.actualDeliveryDate);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    const revenue = order.lines.reduce((sum, line) => sum + Number(line.subtotal || 0), 0);
+    const revenue = order.lines.reduce((sum, line) => sum + Number(line.netPrice || 0), 0);
 
     monthlyRevenue.set(key, (monthlyRevenue.get(key) || 0) + revenue);
   });
@@ -130,12 +130,12 @@ export async function getTopProductsByRevenue(
       },
     },
     _sum: {
-      subtotal: true,
+      netPrice: true,
       quantity: true,
     },
     orderBy: {
       _sum: {
-        subtotal: 'desc',
+        netPrice: 'desc',
       },
     },
     take: limit,
@@ -167,7 +167,7 @@ export async function getTopProductsByRevenue(
       productName: product?.name || 'Unknown',
       categoryName: product?.category,
       supplierName: product?.supplier?.name,
-      totalRevenue: Number(pr._sum.subtotal || 0),
+      totalRevenue: Number(pr._sum.netPrice || 0),
       totalUnits: Number(pr._sum.quantity || 0),
     };
   });

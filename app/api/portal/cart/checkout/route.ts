@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         customerId,
         cart.items.map((item) => ({
           productId: item.productId,
-          quantity: item.quantity,
+          quantity: Number(item.quantity),
           unitPrice: Number(item.unitPrice),
         }))
       );
@@ -177,9 +177,10 @@ export async function POST(request: NextRequest) {
             id: line.id,
             productId: line.productId,
             productName: line.product?.name || 'Unknown Product',
-            quantity: line.quantity,
+            quantity: Number(line.quantity),
+            cases: Number(line.cases),
             unitPrice: Number(line.unitPrice),
-            totalPrice: Number(line.totalAmount ?? line.subtotal),
+            totalPrice: Number(line.netPrice),
           })),
           createdAt: order.order.createdAt.toISOString(),
         },

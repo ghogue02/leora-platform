@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "claude-flow": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["claude-flow@alpha", "mcp", "start"],
+      "env": {}
+    },
+    "ruv-swarm": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["ruv-swarm", "mcp", "start"],
+      "env": {}
+    },
+    "flow-nexus": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["flow-nexus@latest", "mcp", "start"],
+      "env": {}
+    },
+    "agentic-payments": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["agentic-payments@latest", "mcp"],
+      "env": {}
+    },
+    "supabase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres.zqezunzlyjkseugujkrl:UHXGhJvhEPRGpL06@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
+      ],
+      "env": {
+        "POSTGRES_SSL": "true",
+        "POSTGRES_SSL_REJECT_UNAUTHORIZED": "false",
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      }
+    }
+  }
+}

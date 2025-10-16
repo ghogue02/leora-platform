@@ -140,8 +140,8 @@ export async function detectCustomerOpportunities(
       },
     });
 
-    const totalRevenue = orderLines.reduce((sum, line) => sum + Number(line.subtotal || 0), 0);
-    const totalUnits = orderLines.reduce((sum, line) => sum + line.quantity, 0);
+    const totalRevenue = orderLines.reduce((sum, line) => sum + Number(line.netPrice || 0), 0);
+    const totalUnits = orderLines.reduce((sum, line) => sum + Number(line.quantity), 0);
     const uniqueCustomers = new Set(orderLines.map((line) => line.order.customerId));
     const customersPurchased = uniqueCustomers.size;
     const penetrationPercent = totalCustomers > 0 ? (customersPurchased / totalCustomers) * 100 : 0;

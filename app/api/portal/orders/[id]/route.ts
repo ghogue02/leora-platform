@@ -111,9 +111,10 @@ export async function GET(
       productId: line.productId,
       productName: line.product?.name || 'Unknown Product',
       skuId: line.product?.sku || null,
-      quantity: line.quantity,
+      quantity: Number(line.quantity),
+      cases: Number(line.cases),
       unitPrice: Number(line.unitPrice),
-      totalPrice: Number(line.totalAmount),
+      totalPrice: Number(line.netPrice),
     }));
 
     const formattedOrder = {

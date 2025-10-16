@@ -657,31 +657,27 @@ model Order {
 
 model OrderLine {
   id                String   @id @default(cuid())
+  tenantId          String
   orderId           String
   order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId         String
   product           Product  @relation(fields: [productId], references: [id])
+  skuId             String?
 
-  lineNumber        Int
-
-  quantity          Int
+  quantity          Decimal  @db.Decimal(10,2)
+  cases             Decimal  @db.Decimal(10,2) @default(0)
+  liters            Decimal? @db.Decimal(10,2)
   unitPrice         Decimal  @db.Decimal(10,2)
-  subtotal          Decimal  @db.Decimal(10,2)
-  taxAmount         Decimal  @db.Decimal(10,2) @default(0)
-  discountAmount    Decimal  @db.Decimal(10,2) @default(0)
-  totalAmount       Decimal  @db.Decimal(10,2)
+  netPrice          Decimal  @db.Decimal(10,2)
 
-  appliedPricingRules Json?
-
-  isSample          Boolean  @default(false)
-
-  notes             String?
+  appliedPricingRules Json? @map("applied_pricing_rules")
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   @@index([orderId])
   @@index([productId])
+  @@index([tenantId])
   @@map("order_lines")
 }
 
@@ -811,13 +807,12 @@ model CartItem {
   productId         String
   product           Product  @relation(fields: [productId], references: [id])
 
-  quantity          Int      @default(1)
+  quantity          Decimal  @db.Decimal(10,2)
+  cases             Decimal  @db.Decimal(10,2)
   unitPrice         Decimal  @db.Decimal(10,2)
-  subtotal          Decimal  @db.Decimal(10,2)
+  netPrice          Decimal  @db.Decimal(10,2)
 
-  notes             String?
-
-  createdAt         DateTime @default(now())
+  addedAt           DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   @@index([cartId])

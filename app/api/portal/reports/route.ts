@@ -169,8 +169,8 @@ export async function GET(request: NextRequest) {
         });
       }
       const entry = topProductsMap.get(productId)!;
-      entry.revenue += Number(line.totalAmount);
-      entry.quantity += line.quantity;
+      entry.revenue += Number(line.netPrice);
+      entry.quantity += Number(line.quantity);
     });
 
     const topProducts = Array.from(topProductsMap.values())

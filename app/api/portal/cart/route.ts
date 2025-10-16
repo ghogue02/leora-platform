@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
               },
             },
             orderBy: {
-              createdAt: 'desc',
+              addedAt: 'desc',
             },
           },
         },
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
       // Calculate totals
       const subtotal = userCart.items.reduce(
-        (sum, item) => sum + Number(item.subtotal),
+        (sum, item) => sum + Number(item.netPrice),
         0
       );
       const { taxAmount: tax, shippingAmount: shipping } = computeCharges(subtotal, {
@@ -99,16 +99,16 @@ export async function GET(request: NextRequest) {
           productName: item.product.name,
           productSku: item.product.sku,
           quantity: item.quantity,
+          cases: Number(item.cases),
           unitPrice: Number(item.unitPrice),
-          totalPrice: Number(item.subtotal),
+          totalPrice: Number(item.netPrice),
           imageUrl: item.product.imageUrl,
-          notes: item.notes,
         })),
         subtotal,
         tax,
         shipping,
         total,
-        itemCount: userCart.items.reduce((sum, item) => sum + item.quantity, 0),
+        itemCount: userCart.items.reduce((sum, item) => sum + Number(item.quantity), 0),
         updatedAt: userCart.updatedAt.toISOString(),
       };
     });

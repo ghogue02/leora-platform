@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
           });
         }
         const entry = opportunityMap.get(key)!;
-        entry.revenue += Number(line.totalAmount);
+        entry.revenue += Number(line.netPrice);
         if (line.order?.customerId) {
           entry.customers.add(line.order.customerId);
         }

@@ -108,12 +108,15 @@ export async function POST(request: NextRequest) {
       let cartItem;
       if (existingItem) {
         // Update quantity
-        const newQuantity = existingItem.quantity + quantity;
+        const newQuantity = Number(existingItem.quantity) + quantity;
+        const newCases = Math.ceil(newQuantity / 12); // Assuming 12 units per case
         cartItem = await tx.cartItem.update({
           where: { id: existingItem.id },
           data: {
             quantity: newQuantity,
-            subtotal: price * newQuantity,
+            cases: newCases,
+            unitPrice: price,
+            netPrice: price * newQuantity,
           },
           include: {
             product: {
@@ -128,13 +131,15 @@ export async function POST(request: NextRequest) {
         });
       } else {
         // Create new item
+        const cases = Math.ceil(quantity / 12); // Assuming 12 units per case
         cartItem = await tx.cartItem.create({
           data: {
             cartId: cart.id,
             productId,
             quantity,
+            cases,
             unitPrice: price,
-            subtotal: price * quantity,
+            netPrice: price * quantity,
           },
           include: {
             product: {
@@ -158,8 +163,9 @@ export async function POST(request: NextRequest) {
         productName: cartItem.product.name,
         productSku: cartItem.product.sku,
         quantity: cartItem.quantity,
+        cases: Number(cartItem.cases),
         unitPrice: Number(cartItem.unitPrice),
-        totalPrice: Number(cartItem.subtotal),
+        totalPrice: Number(cartItem.netPrice),
         imageUrl: cartItem.product.imageUrl,
       };
     });
@@ -236,11 +242,13 @@ export async function PATCH(request: NextRequest) {
       }
 
       // Update item
+      const cases = Math.ceil(quantity / 12); // Assuming 12 units per case
       const updatedItem = await tx.cartItem.update({
         where: { id: itemId },
         data: {
           quantity,
-          subtotal: Number(cartItem.unitPrice) * quantity,
+          cases,
+          netPrice: Number(cartItem.unitPrice) * quantity,
         },
         include: {
           product: {
@@ -262,8 +270,9 @@ export async function PATCH(request: NextRequest) {
         productId: updatedItem.productId,
         productName: updatedItem.product.name,
         quantity: updatedItem.quantity,
+        cases: Number(updatedItem.cases),
         unitPrice: Number(updatedItem.unitPrice),
-        totalPrice: Number(updatedItem.subtotal),
+        totalPrice: Number(updatedItem.netPrice),
       };
     });
 

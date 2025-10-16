@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         customerName: order.customer?.company?.name || 'Unknown Customer',
         status: order.status.toLowerCase(),
         totalAmount: Number(order.totalAmount),
-        itemCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
+        itemCount: order.lines.reduce((sum, line) => sum + Number(line.quantity), 0),
         createdAt: order.orderDate.toISOString(),
         deliveryDate: order.actualDeliveryDate ? order.actualDeliveryDate.toISOString() : null,
       }));
@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
       subtotal: Number(result.order.subtotal),
       tax: Number(result.order.taxAmount),
       shipping: Number(result.order.shippingAmount),
-      itemCount: result.order.lines.reduce((sum, line) => sum + line.quantity, 0),
+      itemCount: result.order.lines.reduce((sum, line) => sum + Number(line.quantity), 0),
       createdAt: result.order.orderDate ? result.order.orderDate.toISOString() : result.order.createdAt.toISOString(),
       notes: result.order.notes,
       requestedDeliveryDate: result.order.requestedDeliveryDate
@@ -274,9 +274,10 @@ export async function POST(request: NextRequest) {
         productId: line.productId,
         productName: line.product?.name || 'Unknown Product',
         productSku: line.product?.sku || '',
-        quantity: line.quantity,
+        quantity: Number(line.quantity),
+        cases: Number(line.cases),
         unitPrice: Number(line.unitPrice),
-        totalPrice: Number(line.subtotal),
+        totalPrice: Number(line.netPrice),
       })),
       charges: {
         tax: result.charges.taxAmount,

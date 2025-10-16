@@ -82,7 +82,7 @@ export async function calculateAccountHealth(
         select: {
           quantity: true,
           unitPrice: true,
-          subtotal: true,
+          netPrice: true,
         },
       },
     },
@@ -102,7 +102,7 @@ export async function calculateAccountHealth(
     const month = orderDate.getMonth() + 1; // 1-12
     const key = `${year}-${String(month).padStart(2, '0')}`;
 
-    const revenue = order.lines.reduce((sum, line) => sum + Number(line.subtotal || 0), 0);
+    const revenue = order.lines.reduce((sum, line) => sum + Number(line.netPrice || 0), 0);
 
     if (!monthlyMap.has(key)) {
       monthlyMap.set(key, {

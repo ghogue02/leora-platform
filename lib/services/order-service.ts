@@ -94,21 +94,22 @@ async function prepareOrderLines(
       isSampleOrder = false;
     }
 
+    const cases = Math.ceil(line.quantity / 12); // Assuming 12 units per case
+    const liters = line.quantity * 0.75; // Assuming 750ml bottles
+
     createInputs.push({
+      tenantId,
       product: {
         connect: { id: line.productId }
       },
-      lineNumber: index + 1,
       quantity: line.quantity,
+      cases,
+      liters,
       unitPrice: new Prisma.Decimal(calculatedPrice),
-      subtotal: new Prisma.Decimal(lineSubtotal),
-      taxAmount: new Prisma.Decimal(0),
-      discountAmount: new Prisma.Decimal(0),
-      totalAmount: new Prisma.Decimal(lineSubtotal),
+      netPrice: new Prisma.Decimal(lineSubtotal),
       appliedPricingRules: JSON.stringify({
         source: line.unitPrice ? 'manual' : 'system',
       }),
-      notes: line.notes,
     });
 
     inventoryAdjustments.push({

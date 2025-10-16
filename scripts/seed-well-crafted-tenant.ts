@@ -643,22 +643,24 @@ async function seedDemoData(tenantId: string) {
 
     const lines = selectedProducts.map((product, index) => {
       const unitPrice = Number(product.skus[0]?.basePrice || 45);
-      const lineSubtotal = unitPrice * quantityPerLine;
-      const lineTax = lineSubtotal * taxRate;
+      const lineNetPrice = unitPrice * quantityPerLine;
+      const cases = Math.ceil(quantityPerLine / 12);
+      const liters = quantityPerLine * 0.75; // 750ml bottles
 
       return {
+        tenantId,
         productId: product.id,
-        lineNumber: index + 1,
         quantity: quantityPerLine,
+        cases,
+        liters,
         unitPrice,
-        subtotal: Number(lineSubtotal.toFixed(2)),
-        taxAmount: Number(lineTax.toFixed(2)),
-        totalAmount: Number((lineSubtotal + lineTax).toFixed(2)),
+        netPrice: Number(lineNetPrice.toFixed(2)),
+        appliedPricingRules: JSON.stringify({ source: 'seed' }),
       };
     });
 
-    const subtotal = lines.reduce((sum, line) => sum + line.subtotal, 0);
-    const taxAmount = lines.reduce((sum, line) => sum + line.taxAmount, 0);
+    const subtotal = lines.reduce((sum, line) => sum + line.netPrice, 0);
+    const taxAmount = subtotal * taxRate;
     const totalAmount = subtotal + taxAmount;
 
     const orderNumber = `ORD-${new Date()

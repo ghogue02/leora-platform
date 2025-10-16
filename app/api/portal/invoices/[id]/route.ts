@@ -104,10 +104,10 @@ export async function GET(
         productId: line.productId,
         productName: line.product?.name || 'Unknown Product',
         productSku: line.product?.sku || null,
-        quantity: line.quantity,
+        quantity: Number(line.quantity),
+        cases: Number(line.cases),
         unitPrice: Number(line.unitPrice),
-        subtotal: Number(line.subtotal),
-        totalAmount: Number(line.totalAmount),
+        totalAmount: Number(line.netPrice),
       })),
       payments: invoice.payments.map((payment) => ({
         id: payment.id,
