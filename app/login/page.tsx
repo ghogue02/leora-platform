@@ -29,8 +29,8 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Login successful, redirect to dashboard
-        router.push('/dashboard');
+        // Login successful, redirect to demo dashboard
+        router.push('/demo-dashboard');
         router.refresh();
       } else {
         setError(data.error || 'Login failed');
