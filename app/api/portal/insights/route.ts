@@ -15,11 +15,27 @@ import { withTenant } from '@/lib/prisma';
  */
 export async function GET(request: NextRequest) {
   try {
+    console.log('[Insights] Starting request');
+
     // RBAC: Require permission to read insights
-    const user = await requirePermission(request, 'portal.insights.view');
+    let user;
+    try {
+      user = await requirePermission(request, 'portal.insights.view');
+      console.log('[Insights] User authenticated:', user.email);
+    } catch (authError: any) {
+      console.error('[Insights] Auth failed:', authError.message);
+      throw authError;
+    }
 
     // Tenant isolation
-    const tenant = await requireTenant(request);
+    let tenant;
+    try {
+      tenant = await requireTenant(request);
+      console.log('[Insights] Tenant resolved:', tenant.tenantId);
+    } catch (tenantError: any) {
+      console.error('[Insights] Tenant resolution failed:', tenantError.message);
+      throw tenantError;
+    }
 
     // Parse and validate query parameters
     const { searchParams } = new URL(request.url);
