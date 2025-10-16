@@ -268,14 +268,11 @@ export async function withPortalUserFromRequest(
 /**
  * Auto-provision portal user for development/demo
  * Creates user with default portal role
+ * Exported for use in registration flow
  */
-async function autoProvisionPortalUser(
-  tenantId: string,
-  email: string
-): Promise<any> {
-  console.log(`Auto-provisioning portal user: ${email} for tenant: ${tenantId}`);
-
-  // Find or create default portal role
+export async function ensureDefaultPortalRole(
+  tenantId: string
+): Promise<{ id: string; name: string }> {
   let portalRole = await prisma.role.findFirst({
     where: {
       tenantId,
@@ -296,7 +293,6 @@ async function autoProvisionPortalUser(
     });
   }
 
-  // Ensure portal role has baseline permissions needed for dashboard access
   const defaultPortalPermissions = [
     { key: 'portal.access', name: 'Access Portal' },
     { key: 'portal.catalog.view', name: 'View Catalog' },
@@ -339,6 +335,18 @@ async function autoProvisionPortalUser(
       },
     });
   }
+
+  return { id: portalRole.id, name: portalRole.name };
+}
+
+async function autoProvisionPortalUser(
+  tenantId: string,
+  email: string
+): Promise<any> {
+  console.log(`Auto-provisioning portal user: ${email} for tenant: ${tenantId}`);
+
+  // Find or create default portal role
+  const portalRole = await ensureDefaultPortalRole(tenantId);
 
   // Create portal user
   const portalUser = await prisma.portalUser.create({

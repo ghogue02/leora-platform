@@ -103,6 +103,48 @@ This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Co
 4. **Refinement** - TDD implementation (`sparc tdd`)
 5. **Completion** - Integration (`sparc run integration`)
 
+## 🗄️ DATABASE SCHEMA REFERENCE
+
+**CRITICAL: ALWAYS consult the database schema reference before ANY database operations.**
+
+**Schema Reference File**: `/Users/greghogue/Leora/docs/database/DATABASE-SCHEMA-REFERENCE.md`
+**Agent Guidelines**: `/Users/greghogue/Leora/docs/AGENTS.md` (For all AI agents working on this project)
+
+### Quick Rules (MUST FOLLOW):
+1. **NO ENUMS**: All status/role/type fields are String, not enums
+2. **Prisma Relations**: Use `connect` syntax, never raw foreign keys
+3. **Tenant Isolation**: ALWAYS include `tenantId` in queries
+4. **Money Amounts**: Use `Prisma.Decimal`, never plain numbers
+5. **Schema File**: `prisma/schema.prisma` is the source of truth
+
+### Common Mistakes to Avoid:
+```typescript
+// ❌ WRONG - Enums don't exist
+role: UserRole.ADMIN
+
+// ✅ CORRECT - Use string literals
+role: "ADMIN"
+
+// ❌ WRONG - Direct foreign key
+productId: "abc123"
+
+// ✅ CORRECT - Prisma relation
+product: { connect: { id: "abc123" } }
+
+// ❌ WRONG - Missing tenant filter
+await prisma.customer.findMany({ where: { status: "ACTIVE" } })
+
+// ✅ CORRECT - Always filter by tenant
+await prisma.customer.findMany({ where: { tenantId, status: "ACTIVE" } })
+```
+
+**Before writing ANY database code:**
+1. Read `/docs/database/DATABASE-SCHEMA-REFERENCE.md`
+2. Check the exact model structure in `prisma/schema.prisma`
+3. Use String for status/role/type fields (NOT enums)
+4. Use `Prisma.Decimal` for money amounts
+5. Use `connect` for relations
+
 ## Code Style & Best Practices
 
 - **Modular Design**: Files under 500 lines
@@ -110,6 +152,7 @@ This project uses SPARC (Specification, Pseudocode, Architecture, Refinement, Co
 - **Test-First**: Write tests before implementation
 - **Clean Architecture**: Separate concerns
 - **Documentation**: Keep updated
+- **Database Operations**: Follow schema reference EXACTLY
 
 ## 🚀 Available Agents (54 Total)
 
