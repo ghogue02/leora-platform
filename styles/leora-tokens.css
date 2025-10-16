@@ -1,0 +1,143 @@
+/**
+ * Leora Design System Tokens
+ * Brand-consistent design tokens for the Leora Platform
+ */
+
+:root {
+  /* Color Palette - Light Theme */
+  --color-ivory: #F9F7F3;
+  --color-ink: #0B0B0B;
+  --color-gold: #C8A848;
+  --color-slate: #5B6573;
+
+  /* Semantic Colors - Light Theme */
+  --color-background: var(--color-ivory);
+  --color-foreground: var(--color-ink);
+  --color-border: #E5DFD3;
+  --color-muted: #F1EDE5;
+  --color-accent: var(--color-gold);
+  --color-accent-hover: #A68A3A;
+  --color-destructive: #DC2626;
+  --color-success: #16A34A;
+  --color-warning: #EA580C;
+  --color-info: #2563EB;
+
+  /* Typography */
+  --font-sans: 'Inter', 'DejaVu Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+
+  /* Font Sizes */
+  --text-display-lg: 4rem;
+  --text-display-md: 3rem;
+  --text-display-sm: 2.25rem;
+  --text-heading-xl: 2rem;
+  --text-heading-lg: 1.5rem;
+  --text-heading-md: 1.25rem;
+  --text-heading-sm: 1.125rem;
+  --text-body-lg: 1.125rem;
+  --text-body-md: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.75rem;
+  --text-label: 0.875rem;
+
+  /* Spacing Scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  /* Border Radius */
+  --radius-card: 14px;
+  --radius-elevated: 18px;
+  --radius-button: 10px;
+  --radius-input: 8px;
+  --radius-sm: 6px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(11, 11, 11, 0.08);
+  --shadow-card-hover: 0 4px 16px rgba(11, 11, 11, 0.12);
+  --shadow-elevated: 0 8px 24px rgba(11, 11, 11, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(200, 168, 72, 0.3);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-Index Scale */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-tooltip: 1600;
+}
+
+/* Dark Theme */
+.theme-dark {
+  /* Color Overrides - Dark Theme */
+  --color-background: var(--color-ink);
+  --color-foreground: var(--color-ivory);
+  --color-border: #2A2E3A;
+  --color-muted: #1A1C27;
+  --color-accent: #DDCA7D;
+  --color-accent-hover: #E7D9A3;
+
+  /* Shadow Overrides - Dark Theme */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-focus: 0 0 0 3px rgba(221, 202, 125, 0.4);
+}
+
+/* Component-Specific Tokens */
+
+/* Buttons */
+:root {
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 48px;
+  --button-padding-x-sm: 12px;
+  --button-padding-x-md: 16px;
+  --button-padding-x-lg: 24px;
+}
+
+/* Inputs */
+:root {
+  --input-height-sm: 32px;
+  --input-height-md: 40px;
+  --input-height-lg: 48px;
+  --input-padding-x: 12px;
+}
+
+/* Cards */
+:root {
+  --card-padding-sm: 16px;
+  --card-padding-md: 24px;
+  --card-padding-lg: 32px;
+}
+
+/* Layout */
+:root {
+  --nav-height: 64px;
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 64px;
+  --content-max-width: 1440px;
+  --container-padding: 24px;
+}
+
+/* Breakpoints (for reference in JS) */
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}

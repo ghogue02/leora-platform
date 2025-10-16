@@ -1,0 +1,113 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "app/api/leora/**/*.ts": {
+      "maxDuration": 60,
+      "memory": 2048
+    },
+    "app/workers/**/*.ts": {
+      "maxDuration": 300,
+      "memory": 512
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/webhook-delivery",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-insights",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/health-checks",
+      "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-sessions",
+      "schedule": "0 2 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/healthz",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api/v1/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/login",
+      "destination": "/portal/auth/login",
+      "permanent": true
+    },
+    {
+      "source": "/signup",
+      "destination": "/portal/auth/register",
+      "permanent": true
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_VERCEL_ENV": "@vercel-env",
+    "VERCEL_GIT_COMMIT_SHA": "@vercel-git-commit-sha",
+    "VERCEL_GIT_COMMIT_REF": "@vercel-git-commit-ref"
+  },
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_SKIP_POSTINSTALL": "false",
+      "SKIP_ENV_VALIDATION": "false"
+    }
+  },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "git": {
+    "deploymentEnabled": true
+  }
+}
