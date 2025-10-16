@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, className }) => {
             <Menu className="h-5 w-5" />
           </Button>
 
-          <Link href="/portal" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <span className="text-heading-md font-semibold">Leora</span>
           </Link>
         </div>

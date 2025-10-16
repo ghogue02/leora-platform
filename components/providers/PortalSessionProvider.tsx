@@ -285,7 +285,7 @@ export function useRequireAuth() {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       // Redirect to login
-      window.location.href = '/portal/login';
+      window.location.href = '/login';
     }
   }, [isLoading, isAuthenticated]);
 

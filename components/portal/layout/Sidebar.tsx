@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  Users,
   FileText,
-  Settings,
+  Package,
+  ShoppingCart,
   TrendingUp,
-  Calendar,
-  MessageSquare,
-  HelpCircle,
+  MessageCircle,
+  User,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,14 +20,14 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/portal', icon: LayoutDashboard },
-  { label: 'Clients', href: '/portal/clients', icon: Users },
-  { label: 'Documents', href: '/portal/documents', icon: FileText },
-  { label: 'Analytics', href: '/portal/analytics', icon: TrendingUp },
-  { label: 'Calendar', href: '/portal/calendar', icon: Calendar },
-  { label: 'Messages', href: '/portal/messages', icon: MessageSquare },
-  { label: 'Settings', href: '/portal/settings', icon: Settings },
-  { label: 'Help', href: '/portal/help', icon: HelpCircle },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Orders', href: '/orders', icon: FileText },
+  { label: 'Products', href: '/products', icon: Package },
+  { label: 'Cart', href: '/cart', icon: ShoppingCart },
+  { label: 'Invoices', href: '/invoices', icon: CreditCard },
+  { label: 'Insights', href: '/insights', icon: TrendingUp },
+  { label: 'Ask Leora', href: '/leora', icon: MessageCircle },
+  { label: 'Account', href: '/account', icon: User },
 ];
 
 interface SidebarProps {
@@ -50,7 +50,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, className }
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive =
+              pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <li key={item.href}>

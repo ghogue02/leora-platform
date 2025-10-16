@@ -376,7 +376,7 @@ export class InsightsComposer {
         title: `Contact ${customer.name}`,
         description: `Schedule follow-up call - ${customer.deviationDays} days past normal ordering pace`,
         priority: 'high',
-        actionUrl: `/portal/customers/${customer.id}`,
+        actionUrl: `/customers/${customer.id}`,
       });
     }
 
@@ -387,7 +387,7 @@ export class InsightsComposer {
         title: `Review ${customer.name} account`,
         description: `Investigate ${Math.abs(customer.revenueChangePercent).toFixed(0)}% revenue decline`,
         priority: 'high',
-        actionUrl: `/portal/customers/${customer.id}`,
+        actionUrl: `/customers/${customer.id}`,
       });
     }
 
@@ -397,7 +397,7 @@ export class InsightsComposer {
         title: 'Clear overdue activities',
         description: `${metrics.pipeline.overdueActivities} activities need follow-up`,
         priority: 'medium',
-        actionUrl: '/portal/activities',
+        actionUrl: '/insights',
       });
     }
 

@@ -44,7 +44,7 @@ export function PortalAuthGuard({
   requiredRoles,
   requireAny = false,
   fallback,
-  redirectTo = '/portal/login',
+  redirectTo = '/login',
   onUnauthorized,
 }: PortalAuthGuardProps) {
   const router = useRouter();
@@ -74,7 +74,7 @@ export function PortalAuthGuard({
         if (onUnauthorized) {
           onUnauthorized();
         } else {
-          router.push('/portal/unauthorized');
+          router.push('/unauthorized');
         }
         return;
       }
@@ -91,7 +91,7 @@ export function PortalAuthGuard({
         if (onUnauthorized) {
           onUnauthorized();
         } else {
-          router.push('/portal/unauthorized');
+          router.push('/unauthorized');
         }
         return;
       }

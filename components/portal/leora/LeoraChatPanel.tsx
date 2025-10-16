@@ -7,12 +7,15 @@
 
 'use client';
 
+import Link from 'next/link';
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, ChatResponse, AIResponse } from '@/lib/ai/types';
 
 // ============================================================================
 // Types
 // ============================================================================
+
+type RecommendedAction = NonNullable<AIResponse['recommendedActions']>[number];
 
 interface Message extends ChatMessage {
   id: string;
@@ -270,6 +273,25 @@ export function LeoraChatPanel({
 // Message Bubble Component
 // ============================================================================
 
+function resolveActionHref(action: RecommendedAction) {
+  if (!action.targetId) return null;
+
+  switch (action.targetType) {
+    case 'customer':
+      return `/customers/${action.targetId}`;
+    case 'order':
+      return `/orders/${action.targetId}`;
+    case 'product':
+      return `/products/${action.targetId}`;
+    case 'invoice':
+      return `/invoices/${action.targetId}`;
+    case 'sample':
+      return `/insights`;
+    default:
+      return null;
+  }
+}
+
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === 'user';
 
@@ -295,14 +317,20 @@ function MessageBubble({ message }: { message: Message }) {
               >
                 <div className="font-medium text-gray-900">{action.title}</div>
                 <div className="text-gray-600">{action.description}</div>
-                {action.targetId && (
-                  <a
-                    href={`/portal/customers/${action.targetId}`}
-                    className="text-amber-600 hover:underline mt-1 inline-block"
-                  >
-                    View Details →
-                  </a>
-                )}
+                {(() => {
+                  const href = resolveActionHref(action);
+
+                  if (!href) return null;
+
+                  return (
+                    <Link
+                      href={href}
+                      className="mt-1 inline-block text-amber-600 hover:underline"
+                    >
+                      View details →
+                    </Link>
+                  );
+                })()}
               </div>
             ))}
           </div>
