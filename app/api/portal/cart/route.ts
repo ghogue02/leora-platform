@@ -19,10 +19,19 @@ export async function GET(request: NextRequest) {
     const tenant = await requireTenant(request);
 
     const cart = await withTenant(tenant.tenantId, async (tx) => {
-      // Find active cart for user
-      let userCart = await tx.cart.findFirst({
+      // Use upsert to prevent race condition (atomic find-or-create)
+      let userCart = await tx.cart.upsert({
         where: {
+          portalUserId_tenantId_status: {
+            portalUserId: user.id,
+            tenantId: tenant.tenantId,
+            status: 'ACTIVE',
+          },
+        },
+        update: {},
+        create: {
           portalUserId: user.id,
+          tenantId: tenant.tenantId,
           status: 'ACTIVE',
         },
         include: {
@@ -45,33 +54,6 @@ export async function GET(request: NextRequest) {
           },
         },
       });
-
-      // Create cart if it doesn't exist
-      if (!userCart) {
-        userCart = await tx.cart.create({
-          data: {
-            portalUserId: user.id,
-            tenantId: tenant.tenantId,
-            status: 'ACTIVE',
-          },
-          include: {
-            items: {
-              include: {
-                product: {
-                  select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    category: true,
-                    imageUrl: true,
-                    sku: true,
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
 
       // Calculate totals
       const subtotal = userCart.items.reduce(

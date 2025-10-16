@@ -315,6 +315,7 @@ export async function GET(request: NextRequest) {
               },
             },
           },
+          take: 10000, // Limit to prevent unbounded queries
         }),
         tx.customer.count({
           where: {

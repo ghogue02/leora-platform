@@ -76,10 +76,8 @@ export async function withTenant<T>(
   }
 
   return await prisma.$transaction(async (tx) => {
-    // Set tenant context in PostgreSQL session
-    await tx.$executeRawUnsafe(
-      `SET LOCAL app.current_tenant_id = '${tenantId}'`
-    );
+    // Set tenant context in PostgreSQL session (using parameterized query to prevent SQL injection)
+    await tx.$executeRaw`SET LOCAL app.current_tenant_id = ${tenantId}`;
 
     return await callback(tx as PrismaClient);
   });
