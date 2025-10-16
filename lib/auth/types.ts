@@ -109,6 +109,8 @@ export interface AuthResponse {
   user?: SessionUser;
   error?: string;
   requiresVerification?: boolean;
+  message?: string;
+  verificationToken?: string; // Only exposed in development for testing
 }
 
 /**
