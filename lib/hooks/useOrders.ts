@@ -26,7 +26,7 @@ export interface OrderDetail extends Order {
     id: string;
     productId: string;
     productName: string;
-    skuId: string | null;
+    skuId: string;
     quantity: number;
     unitPrice: number;
     totalPrice: number;
@@ -36,7 +36,7 @@ export interface OrderDetail extends Order {
     city: string;
     state: string;
     zip: string;
-  } | null;
+  };
   notes: string | null;
   updatedAt: string;
   requestedDeliveryDate: string | null;

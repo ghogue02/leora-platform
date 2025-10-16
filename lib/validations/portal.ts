@@ -4,8 +4,6 @@
 
 import { z } from 'zod';
 
-export const idSchema = z.union([z.string().cuid(), z.string().uuid()]);
-
 // Common schemas
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -35,68 +33,32 @@ export const productFilterSchema = z.object({
 });
 
 // Order schemas
-const ORDER_STATUS_VALUES = ['DRAFT', 'PENDING', 'CONFIRMED', 'IN_PROGRESS', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'ON_HOLD'] as const;
-
 export const orderFilterSchema = z.object({
-  status: z
-    .enum(ORDER_STATUS_VALUES)
-    .or(z.enum(ORDER_STATUS_VALUES.map((s) => s.toLowerCase()) as [string, ...string[]]))
-    .optional(),
-  customerId: idSchema.optional(),
+  status: z.enum(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']).optional(),
+  customerId: z.string().uuid().optional(),
   ...dateRangeSchema.shape,
   ...paginationSchema.shape,
   ...sortSchema.shape,
 });
 
 export const createOrderSchema = z.object({
-  customerId: idSchema,
+  customerId: z.string().uuid(),
   lines: z.array(
     z.object({
-      productId: idSchema,
+      productId: z.string().uuid(),
+      skuId: z.string().uuid(),
       quantity: z.number().int().min(1),
-      unitPrice: z.number().min(0).optional(),
-      notes: z.string().max(500).optional(),
+      unitPrice: z.number().min(0),
     })
   ).min(1),
   notes: z.string().optional(),
   requestedDeliveryDate: z.string().datetime().optional(),
 });
 
-export const updateOrderSchema = z.object({
-  status: z
-    .enum(ORDER_STATUS_VALUES)
-    .or(z.enum(ORDER_STATUS_VALUES.map((s) => s.toLowerCase()) as [string, ...string[]]))
-    .optional(),
-  notes: z.string().max(2000).optional(),
-  requestedDeliveryDate: z.string().datetime().optional(),
-  actualDeliveryDate: z.string().datetime().optional(),
-});
-
-// Invoice schemas
-const INVOICE_STATUS_VALUES = ['DRAFT', 'SENT', 'VIEWED', 'PARTIAL', 'PAID', 'OVERDUE', 'CANCELLED'] as const;
-
-export const invoiceFilterSchema = z.object({
-  status: z
-    .enum(INVOICE_STATUS_VALUES)
-    .or(z.enum(INVOICE_STATUS_VALUES.map((s) => s.toLowerCase()) as [string, ...string[]]))
-    .optional(),
-  ...dateRangeSchema.shape,
-  ...paginationSchema.shape,
-  ...sortSchema.shape,
-});
-
-// Account schemas
-export const accountUpdateSchema = z.object({
-  firstName: z.string().max(100).optional(),
-  lastName: z.string().max(100).optional(),
-  phone: z.string().max(50).optional(),
-  companyName: z.string().max(200).optional(),
-});
-
 // Cart schemas
 export const addToCartSchema = z.object({
-  productId: idSchema,
-  skuId: idSchema.optional(),
+  productId: z.string().uuid(),
+  skuId: z.string().uuid(),
   quantity: z.number().int().min(1),
 });
 
@@ -106,15 +68,15 @@ export const updateCartItemSchema = z.object({
 
 export const checkoutSchema = z.object({
   paymentMethodId: z.string().optional(),
-  shippingAddressId: idSchema.optional(),
-  billingAddressId: idSchema.optional(),
+  shippingAddressId: z.string().uuid().optional(),
+  billingAddressId: z.string().uuid().optional(),
   notes: z.string().optional(),
   requestedDeliveryDate: z.string().datetime().optional(),
 });
 
 // Favorites schemas
 export const addFavoriteSchema = z.object({
-  productId: idSchema,
+  productId: z.string().uuid(),
 });
 
 // List schemas
@@ -125,8 +87,8 @@ export const createListSchema = z.object({
 });
 
 export const addToListSchema = z.object({
-  listId: idSchema,
-  productId: idSchema,
+  listId: z.string().uuid(),
+  productId: z.string().uuid(),
 });
 
 // Report schemas
@@ -151,6 +113,6 @@ export const notificationFilterSchema = z.object({
 });
 
 export const markNotificationReadSchema = z.object({
-  notificationId: idSchema,
+  notificationId: z.string().uuid(),
   read: z.boolean().default(true),
 });

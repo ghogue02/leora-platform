@@ -6,13 +6,12 @@
  */
 
 import { NextRequest } from 'next/server';
+import { z } from 'zod';
 import type { PrismaClient } from '@prisma/client';
 import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requireAuth } from '@/app/api/_utils/auth';
 import { withTenant } from '@/lib/prisma';
-import { idSchema } from '@/lib/validations/portal';
-import { z } from 'zod';
 
 const createTemplateSchema = z.object({
   name: z.string().min(1).max(100),
@@ -20,7 +19,7 @@ const createTemplateSchema = z.object({
   items: z
     .array(
       z.object({
-        productId: idSchema,
+        productId: z.string().uuid(),
         quantity: z.number().int().min(1).default(1),
       })
     )

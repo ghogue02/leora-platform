@@ -129,9 +129,6 @@ Leora supports multiple distributor tenants with complete data isolation:
 Secure JWT-based authentication with:
 
 - Email/password login with rate limiting and lockout protection
-- Self-service registration with email verification tokens (24-hour expiry). In non-production environments the verification token is returned in the API payload and logged to the console for convenience.
-- `/api/portal/auth/verify-email` auto-activates the user and establishes a session once the token is confirmed.
-- `/api/portal/auth/reset-password` issues one-time reset tokens (1-hour expiry) without leaking user existence; `/api/portal/auth/reset-password` `PUT` rotates credentials and revokes active sessions.
 - Access and refresh token rotation
 - Role-based access control (RBAC)
 - Session management with audit logging

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useAddToCart } from '@/lib/hooks/useCart';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -142,15 +141,11 @@ export default function ProductsPage() {
                 <CardContent className="pt-6">
                   <div className="mb-4">
                     {product.imageUrl ? (
-                      <div className="relative h-48 w-full overflow-hidden rounded-card bg-muted">
-                        <Image
-                          src={product.imageUrl}
-                          alt={product.name}
-                          fill
-                          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                          className="object-cover"
-                        />
-                      </div>
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-48 w-full object-cover rounded-card"
+                      />
                     ) : (
                       <div className="h-48 w-full bg-muted rounded-card flex items-center justify-center">
                         <Package className="h-12 w-12 text-slate-400" />
