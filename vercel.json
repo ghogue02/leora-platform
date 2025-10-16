@@ -95,11 +95,6 @@
       "permanent": true
     }
   ],
-  "env": {
-    "NEXT_PUBLIC_VERCEL_ENV": "@vercel-env",
-    "VERCEL_GIT_COMMIT_SHA": "@vercel-git-commit-sha",
-    "VERCEL_GIT_COMMIT_REF": "@vercel-git-commit-ref"
-  },
   "build": {
     "env": {
       "PRISMA_GENERATE_SKIP_POSTINSTALL": "false",
