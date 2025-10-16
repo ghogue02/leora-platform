@@ -161,12 +161,13 @@ export interface PermissionCheck {
  */
 export interface Role {
   id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  permissions: string[];
   tenantId: string;
-  isSystemRole: boolean;
+  name: string;
+  description?: string;
+  roleType?: string;
+  isDefault: boolean;
+  isSystem: boolean;
+  permissions: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -176,11 +177,11 @@ export interface Role {
  */
 export interface Permission {
   id: string;
+  tenantId: string;
+  key: string;
   name: string;
-  slug: string;
   description?: string;
-  category: string;
-  isSystemPermission: boolean;
+  category?: string;
   createdAt: Date;
   updatedAt: Date;
 }

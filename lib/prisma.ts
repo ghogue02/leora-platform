@@ -275,16 +275,21 @@ async function autoProvisionPortalUser(
 
   // Find or create default portal role
   let portalRole = await prisma.role.findFirst({
-    where: { name: 'portal_user' },
+    where: {
+      tenantId,
+      name: 'Portal User',
+    },
   });
 
   if (!portalRole) {
     portalRole = await prisma.role.create({
       data: {
-        name: 'portal_user',
-        displayName: 'Portal User',
+        tenantId,
+        name: 'Portal User',
         description: 'Default customer portal user role',
-        isSystemRole: true,
+        roleType: 'PORTAL',
+        isDefault: false,
+        isSystem: true,
       },
     });
   }

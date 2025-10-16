@@ -31,56 +31,66 @@ const TENANT_NAME = 'Well Crafted';
 // System roles
 const SYSTEM_ROLES = [
   {
-    name: 'admin',
-    displayName: 'Administrator',
+    key: 'admin',
+    name: 'Administrator',
     description: 'Full system access',
-    isSystemRole: true,
+    roleType: 'SYSTEM',
+    isSystem: true,
+    isDefault: false,
   },
   {
-    name: 'sales_manager',
-    displayName: 'Sales Manager',
+    key: 'sales_manager',
+    name: 'Sales Manager',
     description: 'Manage sales team and accounts',
-    isSystemRole: true,
+    roleType: 'SYSTEM',
+    isSystem: true,
+    isDefault: false,
   },
   {
-    name: 'sales_rep',
-    displayName: 'Sales Representative',
+    key: 'sales_rep',
+    name: 'Sales Representative',
     description: 'Access to assigned accounts and activities',
-    isSystemRole: true,
+    roleType: 'SYSTEM',
+    isSystem: true,
+    isDefault: false,
   },
   {
-    name: 'portal_admin',
-    displayName: 'Portal Administrator',
+    key: 'portal_admin',
+    name: 'Portal Administrator',
     description: 'Customer portal administration',
-    isSystemRole: true,
+    roleType: 'PORTAL',
+    isSystem: true,
+    isDefault: false,
   },
   {
-    name: 'portal_user',
-    displayName: 'Portal User',
+    key: 'portal_user',
+    name: 'Portal User',
     description: 'Standard customer portal access',
-    isSystemRole: true,
+    roleType: 'PORTAL',
+    isSystem: true,
+    isDefault: true,
   },
 ];
 
 // System permissions (aligned with RBAC categories)
 const SYSTEM_PERMISSIONS = [
-  { resource: 'portal', action: 'access', name: 'portal.access', displayName: 'Access Portal' },
-  { resource: 'portal', action: 'catalog.view', name: 'portal.catalog.view', displayName: 'View Catalog' },
-  { resource: 'portal', action: 'orders.view', name: 'portal.orders.view', displayName: 'View Orders' },
-  { resource: 'portal', action: 'orders.create', name: 'portal.orders.create', displayName: 'Create Orders' },
-  { resource: 'portal', action: 'cart.manage', name: 'portal.cart.manage', displayName: 'Manage Cart' },
-  { resource: 'portal', action: 'favorites.manage', name: 'portal.favorites.manage', displayName: 'Manage Favorites' },
-  { resource: 'portal', action: 'lists.manage', name: 'portal.lists.manage', displayName: 'Manage Lists' },
-  { resource: 'portal', action: 'insights.view', name: 'portal.insights.view', displayName: 'View Insights' },
-  { resource: 'portal', action: 'reports.view', name: 'portal.reports.view', displayName: 'View Reports' },
-  { resource: 'portal', action: 'reports.export', name: 'portal.reports.export', displayName: 'Export Reports' },
-  { resource: 'portal', action: 'notifications.view', name: 'portal.notifications.view', displayName: 'View Notifications' },
+  { key: 'portal.access', name: 'Access Portal', category: 'portal' },
+  { key: 'portal.catalog.view', name: 'View Catalog', category: 'portal' },
+  { key: 'portal.orders.view', name: 'View Orders', category: 'portal' },
+  { key: 'portal.orders.create', name: 'Create Orders', category: 'portal' },
+  { key: 'portal.cart.manage', name: 'Manage Cart', category: 'portal' },
+  { key: 'portal.favorites.manage', name: 'Manage Favorites', category: 'portal' },
+  { key: 'portal.lists.manage', name: 'Manage Lists', category: 'portal' },
+  { key: 'portal.insights.view', name: 'View Insights', category: 'portal' },
+  { key: 'portal.reports.view', name: 'View Reports', category: 'portal' },
+  { key: 'portal.reports.export', name: 'Export Reports', category: 'portal' },
+  { key: 'portal.notifications.view', name: 'View Notifications', category: 'portal' },
 
-  { resource: 'catalog', action: 'products.manage', name: 'catalog.products.manage', displayName: 'Manage Products' },
-  { resource: 'orders', action: 'manage', name: 'orders.manage', displayName: 'Manage Orders' },
-  { resource: 'customers', action: 'manage', name: 'customers.manage', displayName: 'Manage Customers' },
-  { resource: 'analytics', action: 'view', name: 'analytics.view', displayName: 'View Analytics' },
-  { resource: 'analytics', action: 'export', name: 'analytics.export', displayName: 'Export Analytics' },
+  { key: 'catalog.products.manage', name: 'Manage Products', category: 'catalog' },
+  { key: 'orders.manage', name: 'Manage Orders', category: 'orders' },
+  { key: 'customers.manage', name: 'Manage Customers', category: 'customers' },
+  { key: 'analytics.view', name: 'View Analytics', category: 'analytics' },
+  { key: 'analytics.export', name: 'Export Analytics', category: 'analytics' },
 ];
 
 // Sample products
@@ -177,39 +187,70 @@ async function seedTenant() {
   console.log('🌱 Seeding tenant: Well Crafted...');
 
   // Check if tenant exists
-  let tenant = await prisma.tenant.findUnique({
-    where: { slug: TENANT_SLUG },
-    include: { settings: true },
+  async function findTenant(includeSettings: boolean) {
+    return prisma.tenant.findUnique({
+      where: { slug: TENANT_SLUG },
+      ...(includeSettings ? { include: { settings: true } } : {}),
+    });
+  }
+
+  let tenant = await findTenant(true).catch((error) => {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2022') {
+      console.warn(
+        '⚠️  Tenant settings columns are missing expected camelCase fields. Falling back to minimal tenant fetch.'
+      );
+      return findTenant(false);
+    }
+    throw error;
   });
 
   if (!tenant) {
     // Create tenant
-    tenant = await prisma.tenant.create({
-      data: {
-        slug: TENANT_SLUG,
-        name: TENANT_NAME,
-        status: 'ACTIVE',
-        subscriptionTier: 'enterprise',
-        contactEmail: 'admin@wellcrafted.com',
-        settings: {
-          create: {
-            defaultCurrency: 'USD',
-            timezone: 'America/Los_Angeles',
-            dateFormat: 'MM/DD/YY',
-            revenueHealthDropPercent: 15,
-            minimumOrdersForHealth: 3,
-            defaultSampleAllowancePerRep: 60,
-            requireManagerApprovalAbove: 60,
-            minimumOrdersForPaceCalc: 3,
-            paceRiskThresholdDays: 2,
-            portalEnabled: true,
-            cartEnabled: true,
-            invoiceVisibility: true,
+    try {
+      tenant = await prisma.tenant.create({
+        data: {
+          slug: TENANT_SLUG,
+          name: TENANT_NAME,
+          status: 'ACTIVE',
+          subscriptionTier: 'enterprise',
+          contactEmail: 'admin@wellcrafted.com',
+          settings: {
+            create: {
+              defaultCurrency: 'USD',
+              timezone: 'America/Los_Angeles',
+              dateFormat: 'MM/DD/YY',
+              revenueHealthDropPercent: 15,
+              minimumOrdersForHealth: 3,
+              defaultSampleAllowancePerRep: 60,
+              requireManagerApprovalAbove: 60,
+              minimumOrdersForPaceCalc: 3,
+              paceRiskThresholdDays: 2,
+              portalEnabled: true,
+              cartEnabled: true,
+              invoiceVisibility: true,
+            },
           },
         },
-      },
-      include: { settings: true },
-    });
+        include: { settings: true },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2022') {
+        console.warn(
+          '⚠️  Unable to create tenant settings because expected columns are missing. Creating tenant without settings.'
+        );
+        tenant = await prisma.tenant.create({
+          data: {
+            slug: TENANT_SLUG,
+            name: TENANT_NAME,
+            status: 'ACTIVE',
+            subscriptionTier: 'enterprise',
+            contactEmail: 'admin@wellcrafted.com',
+          },
+        });
+      } else {
+        throw error;
+      }
+    }
     console.log(`✅ Created tenant: ${tenant.slug}`);
   } else {
     console.log(`ℹ️  Tenant already exists: ${tenant.slug}`);
@@ -218,43 +259,102 @@ async function seedTenant() {
   return tenant;
 }
 
-async function seedRolesAndPermissions() {
+async function seedRolesAndPermissions(tenantId: string) {
   console.log('🌱 Seeding roles and permissions...');
 
   // Create permissions
   for (const permData of SYSTEM_PERMISSIONS) {
-    await prisma.permission.upsert({
-      where: { name: permData.name },
-      update: {},
-      create: permData,
-    });
+    try {
+      await prisma.permission.upsert({
+        where: { key: permData.key },
+        update: {
+          name: permData.name,
+          category: permData.category ?? null,
+        },
+        create: {
+          tenantId,
+          key: permData.key,
+          name: permData.name,
+          category: permData.category ?? null,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2022') {
+        console.warn(
+          '⚠️  Permission table is missing expected columns. Skipping permission seeding for legacy schema.'
+        );
+        return;
+      } else {
+        throw error;
+      }
+    }
   }
   console.log(`✅ Created ${SYSTEM_PERMISSIONS.length} permissions`);
 
   // Create roles and assign permissions
   for (const roleData of SYSTEM_ROLES) {
-    const role = await prisma.role.upsert({
-      where: { name: roleData.name },
-      update: {},
-      create: roleData,
-    });
+    const role = await (async () => {
+      try {
+        return await prisma.role.upsert({
+          where: {
+            tenantId_name: {
+              tenantId,
+              name: roleData.name,
+            },
+          },
+          update: {
+            description: roleData.description,
+            roleType: roleData.roleType,
+            isDefault: roleData.isDefault ?? false,
+            isSystem: roleData.isSystem ?? false,
+          },
+          create: {
+            tenantId,
+            name: roleData.name,
+            description: roleData.description,
+            roleType: roleData.roleType,
+            isDefault: roleData.isDefault ?? false,
+            isSystem: roleData.isSystem ?? false,
+          },
+        });
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2022') {
+          console.warn(
+            '⚠️  Role table is missing expected columns. Skipping role seeding for legacy schema.'
+          );
+          return prisma.role.findFirst({
+            where: {
+              tenantId,
+              name: roleData.name,
+            },
+          });
+        }
+        throw error;
+      }
+    })();
+
+    if (!role) {
+      continue;
+    }
 
     // Assign permissions based on role
-    const permissionNames = getPermissionsForRole(roleData.name);
+    const permissionKeys = getPermissionsForRole(roleData.key);
     const permissions = await prisma.permission.findMany({
-      where: { name: { in: permissionNames } },
+      where: { key: { in: permissionKeys } },
     });
 
     for (const permission of permissions) {
       await prisma.rolePermission.upsert({
         where: {
-          roleId_permissionId: {
+          tenantId_roleId_permissionId: {
+            tenantId,
             roleId: role.id,
             permissionId: permission.id,
           },
         },
         update: {},
         create: {
+          tenantId,
           roleId: role.id,
           permissionId: permission.id,
         },
@@ -264,10 +364,10 @@ async function seedRolesAndPermissions() {
   console.log(`✅ Created ${SYSTEM_ROLES.length} roles with permissions`);
 }
 
-function getPermissionsForRole(roleName: string): string[] {
-  switch (roleName) {
+function getPermissionsForRole(roleKey: string): string[] {
+  switch (roleKey) {
     case 'admin':
-      return SYSTEM_PERMISSIONS.map((p) => p.name);
+      return SYSTEM_PERMISSIONS.map((p) => p.key);
     case 'sales_manager':
       return [
         'portal.access',
@@ -414,8 +514,13 @@ async function seedCustomers(tenantId: string) {
 async function seedPortalUsers(tenantId: string) {
   console.log('🌱 Seeding portal users...');
 
-  const portalRole = await prisma.role.findUnique({
-    where: { name: 'portal_user' },
+  const portalRole = await prisma.role.findFirst({
+    where: {
+      tenantId,
+      name: {
+        in: ['Portal User', 'Portal Buyer'],
+      },
+    },
   });
 
   if (!portalRole) {
@@ -731,7 +836,7 @@ async function main() {
   try {
     // Seed in order
     const tenant = await seedTenant();
-    await seedRolesAndPermissions();
+    await seedRolesAndPermissions(tenant.id);
     await seedProducts(tenant.id);
     await seedCustomers(tenant.id);
     await seedPortalUsers(tenant.id);
