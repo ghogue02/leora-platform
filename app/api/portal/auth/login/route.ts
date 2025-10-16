@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if account is active
-    if ((user as any).status !== 'active') {
+    if ((user as any).status !== 'ACTIVE') {
       await logAuthActivity({
         action: 'login_failed',
         email,
