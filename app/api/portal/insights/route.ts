@@ -227,33 +227,21 @@ export async function GET(request: NextRequest) {
         tx.customer.count({
           where: {
             tenantId: tenant.tenantId,
-            status: 'ACTIVE',
+            // Note: creditStatus is optional, so count all customers
+            // Filter by company.active if needed
           },
         }),
         tx.customer.count({
           where: {
             tenantId: tenant.tenantId,
-            status: 'ACTIVE',
-            OR: [
-              {
-                orders: {
-                  none: {
-                    orderDate: {
-                      gte: thirtyDaysAgo,
-                    },
-                  },
+            // Customers with no recent orders (at risk)
+            orders: {
+              none: {
+                orderDate: {
+                  gte: thirtyDaysAgo,
                 },
               },
-              {
-                orders: {
-                  some: {
-                    orderDate: {
-                      lt: thirtyDaysAgo,
-                    },
-                  },
-                },
-              },
-            ],
+            },
           },
         }),
         tx.order.findMany({
@@ -268,7 +256,12 @@ export async function GET(request: NextRequest) {
             totalAmount: true,
             actualDeliveryDate: true,
             customer: {
-              select: { companyName: true },
+              select: {
+                id: true,
+                company: {
+                  select: { name: true }
+                }
+              },
             },
           },
           orderBy: {
@@ -448,7 +441,7 @@ export async function GET(request: NextRequest) {
           id: order.id,
           orderDate: order.orderDate.toISOString(),
           totalAmount: Number(order.totalAmount),
-          customerName: order.customer?.companyName || 'Unknown Customer',
+          customerName: order.customer?.company?.name || 'Unknown Customer',
         })),
         totals: {
           orders: totalOrders,

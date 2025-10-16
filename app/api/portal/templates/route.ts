@@ -44,7 +44,7 @@ async function fetchTemplates(tx: PrismaClient, tenantId: string, portalUserId: 
               description: true,
               category: true,
               imageUrl: true,
-              status: true,
+              active: true,
               skus: {
                 select: {
                   basePrice: true,
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
         where: {
           id: { in: items.map((item) => item.productId) },
           tenantId: tenant.tenantId,
-          status: 'ACTIVE',
+          active: true,
         },
         select: { id: true },
       });

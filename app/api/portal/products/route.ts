@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const result = await withTenant(tenant.tenantId, async (tx) => {
       // Build where clause
       const where: any = {
-        status: 'ACTIVE',
+        active: true,
       };
 
       // Search filter

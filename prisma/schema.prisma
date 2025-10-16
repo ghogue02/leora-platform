@@ -45,6 +45,7 @@ model Tenant {
   orders            Order[]
   invoices          Invoice[]
   payments          Payment[]
+  companies         Company[]
   customers         Customer[]
   suppliers         Supplier[]
   activities        Activity[]
@@ -304,23 +305,39 @@ model Product {
   supplierId        String?
   supplier          Supplier? @relation(fields: [supplierId], references: [id])
 
+  itemNumber        String?
   sku               String
   name              String
   description       String?
   category          String?
   brand             String?
+  manufacturer      String?
   varietal          String?
   vintage           String?
   region            String?
+  style             String?
+  color             String?
+  varieties         String?
 
   alcoholType       String?
   alcoholPercent    Decimal? @db.Decimal(5,2)
 
+  unitSize          Decimal? @db.Decimal(10,2)
+  unitType          String?
+  itemsPerCase      Int?
+
   imageUrl          String?
   images            Json?
 
-  status            String   @default("ACTIVE")
+  active            Boolean  @default(true)
   isSample          Boolean  @default(false)
+
+  // Inventory tracking
+  currentStock      Int?
+  reorderPoint      Int?
+  leadTimeDays      Int?
+  avgMonthlySales   Decimal? @db.Decimal(10,2)
+  lastAnalyzedAt    DateTime?
 
   metadata          Json?
 
@@ -336,7 +353,7 @@ model Product {
   listItems         ListItem[]
 
   @@unique([tenantId, sku])
-  @@index([tenantId, status])
+  @@index([tenantId, active])
   @@index([tenantId, category])
   @@index([supplierId])
   @@map("products")
@@ -435,15 +452,55 @@ model PriceListEntry {
 // COMMERCE: CUSTOMERS & SUPPLIERS
 // ============================================================================
 
-model Customer {
+model Company {
   id                String   @id @default(cuid())
   tenantId          String
   tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  accountNumber     String?
-  companyName       String
-  tradeName         String?
+  type              String?
+  name              String
+  website           String?
+  balance           Decimal? @db.Decimal(10,2)
+  twelveMonthSales  Decimal? @db.Decimal(10,2)
+  lastOrderDate     DateTime?
 
+  licenseNumber     String?
+  taxNumber         String?
+  deliveryInstructions String?
+  deliveryTime      String?
+
+  active            Boolean  @default(true)
+  parentCompanyId   String?
+  parentCompany     Company? @relation("CompanyHierarchy", fields: [parentCompanyId], references: [id])
+
+  latitude          Decimal? @db.Decimal(10,6)
+  longitude         Decimal? @db.Decimal(10,6)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  childCompanies    Company[] @relation("CompanyHierarchy")
+  customers         Customer[]
+
+  @@index([tenantId, active])
+  @@index([tenantId, name])
+  @@map("companies")
+}
+
+model Customer {
+  id                String   @id @default(cuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  companyId         String
+  company           Company  @relation(fields: [companyId], references: [id])
+  salespersonId     String?
+  territoryId       String?
+  routeId           String?
+
+  // Contact & Account Info
+  accountNumber     String?
+  tradeName         String?
   primaryContactName String?
   primaryContactEmail String?
   primaryContactPhone String?
@@ -451,15 +508,33 @@ model Customer {
   billingAddress    Json?
   shippingAddress   Json?
 
-  status            String   @default("ACTIVE")
+  // Credit & Payment
+  creditLimit       Decimal? @db.Decimal(10,2)
+  creditStatus      String?
+  balanceDue        Decimal? @db.Decimal(10,2)
+  paymentTerms      String?
   tier              String?
+  preferredWarehouse String?
 
+  // Health & Pace Tracking
+  healthStatus      String?
+  establishedPace   String?
+  avgOrderIntervalDays Decimal? @db.Decimal(10,2)
+  lastOrderDeliveredAt DateTime?
+  projectedNextOrderDate DateTime?
+  currentMonthlyRevenue Decimal? @db.Decimal(10,2)
+  averageMonthlyRevenue Decimal? @db.Decimal(10,2)
+  lastRevenueRiskDetectedAt DateTime?
+  churnRiskScore    Decimal? @db.Decimal(5,2)
+  lastAnalyzedAt    DateTime?
+  avgOrderValue     Decimal? @db.Decimal(10,2)
+  orderFrequency    Int?
+  lifetimeValue     Decimal? @db.Decimal(10,2)
+
+  // Licensing
   licenseNumber     String?
   licenseState      String?
   licenseExpiry     DateTime?
-
-  paymentTerms      String?
-  creditLimit       Decimal? @db.Decimal(10,2)
 
   notes             String?
   metadata          Json?
@@ -479,7 +554,8 @@ model Customer {
   carts             Cart[]
 
   @@unique([tenantId, accountNumber])
-  @@index([tenantId, status])
+  @@index([tenantId, creditStatus])
+  @@index([tenantId, healthStatus])
   @@map("customers")
 }
 

@@ -169,12 +169,16 @@ export async function calculateAccountHealth(
   // Fetch account name
   const customer = await prisma.customer.findUnique({
     where: { id: accountId },
-    select: { companyName: true },
+    select: {
+      company: {
+        select: { name: true }
+      }
+    },
   });
 
   return {
     accountId,
-    accountName: customer?.companyName || 'Unknown',
+    accountName: customer?.company?.name || 'Unknown',
     currentMonthRevenue,
     baselineAverage,
     percentageChange,
@@ -200,7 +204,9 @@ export async function calculateTenantHealth(
   const customers = await prisma.customer.findMany({
     where: {
       tenantId,
-      status: 'ACTIVE',
+      company: {
+        active: true
+      }
     },
     select: {
       id: true,

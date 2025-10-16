@@ -112,7 +112,9 @@ export async function detectCustomerOpportunities(
   const totalCustomers = await prisma.customer.count({
     where: {
       tenantId,
-      status: 'ACTIVE',
+      company: {
+        active: true
+      }
     },
   });
 
@@ -198,11 +200,17 @@ export async function detectTenantOpportunities(
   const customers = await prisma.customer.findMany({
     where: {
       tenantId,
-      status: 'ACTIVE',
+      company: {
+        active: true
+      }
     },
     select: {
       id: true,
-      companyName: true,
+      company: {
+        select: {
+          name: true
+        }
+      }
     },
   });
 

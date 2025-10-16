@@ -8,8 +8,15 @@ import { NextRequest } from 'next/server';
 import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requirePermission } from '@/app/api/_utils/auth';
+import { Prisma } from '@prisma/client';
 import { orderFilterSchema, createOrderSchema } from '@/lib/validations/portal';
 import { withTenant } from '@/lib/prisma';
+import {
+  adjustInventoryForOrder,
+  computeTenantCharges,
+  generateOrderNumber,
+  prepareOrderLines,
+} from '@/lib/services/order-service';
 
 /**
  * List orders with filters
@@ -83,7 +90,11 @@ export async function GET(request: NextRequest) {
           include: {
             customer: {
               select: {
-                companyName: true,
+                company: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
             lines: {
@@ -105,7 +116,7 @@ export async function GET(request: NextRequest) {
         id: order.id,
         orderNumber: order.orderNumber,
         customerId: order.customerId,
-        customerName: order.customer?.companyName || 'Unknown Customer',
+        customerName: order.customer?.company?.name || 'Unknown Customer',
         status: order.status.toLowerCase(),
         totalAmount: Number(order.totalAmount),
         itemCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
@@ -166,34 +177,114 @@ export async function POST(request: NextRequest) {
 
     const { customerId, lines, notes, requestedDeliveryDate } = validatedBody.data;
 
-    // Validate user can create orders for this customer
     if (user.customerId && user.customerId !== customerId) {
       return Errors.forbidden('Cannot create orders for other customers');
     }
 
-    // TODO: Implement order creation with Prisma
-    // 1. Validate product availability
-    // 2. Calculate pricing with waterfall logic
-    // 3. Create order record with lines
-    // 4. Update inventory
-    // 5. Create audit log entry
+    const result = await withTenant(tenant.tenantId, async (tx) => {
+      const customer = await tx.customer.findFirst({
+        where: {
+          id: customerId,
+          tenantId: tenant.tenantId,
+        },
+        select: {
+          id: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
 
-    const newOrder = {
-      id: 'new-order-1',
-      orderNumber: 'ORD-NEW-001',
-      customerId,
-      status: 'pending',
-      totalAmount: lines.reduce((sum, line) => sum + line.quantity * line.unitPrice, 0),
-      lines: lines.map((line, index) => ({
-        id: `line-${index}`,
-        ...line,
+      if (!customer) {
+        throw new Error('Customer not found');
+      }
+
+      const prepared = await prepareOrderLines(tx, tenant.tenantId, customerId, lines);
+      const orderNumber = await generateOrderNumber(tx, tenant.tenantId);
+      const { charges } = await computeTenantCharges(tx, tenant.tenantId, prepared.subtotal);
+
+      const createdOrder = await tx.order.create({
+        data: {
+          tenantId: tenant.tenantId,
+          customerId,
+          portalUserId: user.id,
+          orderNumber,
+          status: 'PENDING',
+          subtotal: new Prisma.Decimal(prepared.subtotal),
+          taxAmount: new Prisma.Decimal(charges.taxAmount),
+          shippingAmount: new Prisma.Decimal(charges.shippingAmount),
+          discountAmount: new Prisma.Decimal(0),
+          totalAmount: new Prisma.Decimal(
+            prepared.subtotal + charges.taxAmount + charges.shippingAmount
+          ),
+          requestedDeliveryDate: requestedDeliveryDate ? new Date(requestedDeliveryDate) : null,
+          notes,
+          isSampleOrder: prepared.isSampleOrder,
+          lines: {
+            create: prepared.createInputs,
+          },
+        },
+      });
+
+      await adjustInventoryForOrder(tx, tenant.tenantId, prepared.inventoryAdjustments);
+
+      const orderWithRelations = await tx.order.findUnique({
+        where: { id: createdOrder.id },
+        include: {
+          lines: {
+            include: {
+              product: {
+                select: {
+                  name: true,
+                  sku: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        order: orderWithRelations!,
+        charges,
+        customerName: customer.company?.name || 'Unknown Customer',
+      };
+    });
+
+    const formatted = {
+      id: result.order.id,
+      orderNumber: result.order.orderNumber,
+      customerId: result.order.customerId,
+      customerName: result.customerName,
+      status: result.order.status.toLowerCase(),
+      totalAmount: Number(result.order.totalAmount),
+      subtotal: Number(result.order.subtotal),
+      tax: Number(result.order.taxAmount),
+      shipping: Number(result.order.shippingAmount),
+      itemCount: result.order.lines.reduce((sum, line) => sum + line.quantity, 0),
+      createdAt: result.order.orderDate ? result.order.orderDate.toISOString() : result.order.createdAt.toISOString(),
+      notes: result.order.notes,
+      requestedDeliveryDate: result.order.requestedDeliveryDate
+        ? result.order.requestedDeliveryDate.toISOString()
+        : null,
+      lines: result.order.lines.map((line) => ({
+        id: line.id,
+        productId: line.productId,
+        productName: line.product?.name || 'Unknown Product',
+        productSku: line.product?.sku || '',
+        quantity: line.quantity,
+        unitPrice: Number(line.unitPrice),
+        totalPrice: Number(line.subtotal),
       })),
-      notes,
-      requestedDeliveryDate,
-      createdAt: new Date().toISOString(),
+      charges: {
+        tax: result.charges.taxAmount,
+        shipping: result.charges.shippingAmount,
+      },
     };
 
-    return successResponse(newOrder, 201);
+    return successResponse(formatted, 201);
   } catch (error) {
     console.error('Error creating order:', error);
 
