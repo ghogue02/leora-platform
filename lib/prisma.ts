@@ -238,10 +238,12 @@ export async function withPortalUserFromRequest(
   const permissions = new Set<string>();
   const roles = new Set<string>();
 
-  portalUser.roleAssignments.forEach(assignment => {
+  portalUser.roleAssignments.forEach((assignment) => {
     roles.add(assignment.role.name);
-    assignment.role.rolePermissions.forEach(rp => {
-      permissions.add(rp.permission.name);
+    assignment.role.rolePermissions.forEach((rp) => {
+      if (rp.permission?.key) {
+        permissions.add(rp.permission.key);
+      }
     });
   });
 
