@@ -16,7 +16,6 @@ import {
   generateOrderNumber,
   prepareOrderLines,
 } from '@/lib/services/order-service';
-import { resolveProductPrice } from '@/lib/services/pricing';
 
 /**
  * Process checkout
@@ -45,7 +44,6 @@ export async function POST(request: NextRequest) {
     } = validatedBody.data;
 
     const order = await withTenant(tenant.tenantId, async (tx) => {
-      // Find active cart with items
       const cart = await tx.cart.findFirst({
         where: {
           portalUserId: user.id,
@@ -64,97 +62,88 @@ export async function POST(request: NextRequest) {
         throw new Error('Cart is empty');
       }
 
-      // Validate customer exists
       const customerId = user.customerId || cart.customerId;
       if (!customerId) {
         throw new Error('Customer ID required for checkout');
       }
 
-      const customer = await tx.customer.findUnique({
-        where: { id: customerId },
+      const customer = await tx.customer.findFirst({
+        where: {
+          id: customerId,
+          tenantId: tenant.tenantId,
+        },
+        select: {
+          id: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
       });
 
       if (!customer) {
         throw new Error('Customer not found');
       }
 
-      // Verify inventory for all items
-      for (const item of cart.items) {
-        const inventory = await tx.inventory.findFirst({
-          where: { productId: item.productId },
-        });
-
-        const available = inventory?.quantityAvailable || 0;
-        if (available < item.quantity) {
-          throw new Error(
-            `Insufficient inventory for ${item.product.name}. Available: ${available}`
-          );
-        }
-      }
-
-      // Recalculate pricing with waterfall logic
-      let subtotal = 0;
-      const pricedLines = await Promise.all(
-        cart.items.map(async (item) => {
-          const priceResult = await resolveProductPrice(tx, item.productId);
-          const price = priceResult.price;
-          const lineTotal = price * item.quantity;
-          subtotal += lineTotal;
-
-          return {
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: price,
-            totalPrice: lineTotal,
-          };
-        })
+      const prepared = await prepareOrderLines(
+        tx,
+        tenant.tenantId,
+        customerId,
+        cart.items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: Number(item.unitPrice),
+        }))
       );
 
-      const tax = subtotal * 0.09; // Should come from state tax rates
-      const shipping = subtotal > 100 ? 0 : 5.0; // Free shipping over $100
-      const total = subtotal + tax + shipping;
+      const orderNumber = await generateOrderNumber(tx, tenant.tenantId);
+      const { charges } = await computeTenantCharges(tx, tenant.tenantId, prepared.subtotal);
 
-      // Generate order number
-      const orderCount = await tx.order.count({
-        where: { tenantId: tenant.tenantId },
-      });
-      const orderNumber = `ORD-${new Date().getFullYear()}-${String(
-        orderCount + 1
-      ).padStart(6, '0')}`;
-
-      // Create order with lines in transaction
-      const newOrder = await tx.order.create({
+      const createdOrder = await tx.order.create({
         data: {
           orderNumber,
           tenantId: tenant.tenantId,
           customerId,
           portalUserId: user.id,
           status: 'PENDING',
-          subtotal,
-          taxAmount: tax,
-          shippingAmount: shipping,
-          totalAmount: total,
+          subtotal: new Prisma.Decimal(prepared.subtotal),
+          taxAmount: new Prisma.Decimal(charges.taxAmount),
+          shippingAmount: new Prisma.Decimal(charges.shippingAmount),
+          discountAmount: new Prisma.Decimal(0),
+          totalAmount: new Prisma.Decimal(
+            prepared.subtotal + charges.taxAmount + charges.shippingAmount
+          ),
           notes,
           requestedDeliveryDate: requestedDeliveryDate
             ? new Date(requestedDeliveryDate)
             : null,
           lines: {
-            create: pricedLines.map((line, index) => ({
-              product: {
-                connect: { id: line.productId }
-              },
-              lineNumber: index + 1,
-              quantity: line.quantity,
-              unitPrice: line.unitPrice,
-              subtotal: line.totalPrice,
-              totalAmount: line.totalPrice,
-              appliedPricingRules: JSON.stringify({
-                source: 'price_list',
-                effectiveDate: new Date(),
-              }),
-            })),
+            create: prepared.createInputs,
           },
         },
+      });
+
+      await adjustInventoryForOrder(tx, tenant.tenantId, prepared.inventoryAdjustments);
+
+      await tx.cartItem.deleteMany({
+        where: { cartId: cart.id },
+      });
+
+      await tx.cart.update({
+        where: { id: cart.id },
+        data: {
+          status: 'CONVERTED',
+          convertedToOrderId: createdOrder.id,
+          subtotal: 0,
+          taxAmount: 0,
+          shippingAmount: 0,
+          totalAmount: 0,
+        },
+      });
+
+      const orderWithRelations = await tx.order.findUnique({
+        where: { id: createdOrder.id },
         include: {
           lines: {
             include: {
@@ -164,61 +153,34 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Reserve inventory
-      for (const line of pricedLines) {
-        await tx.inventory.updateMany({
-          where: { productId: line.productId },
-          data: {
-            quantityReserved: {
-              increment: line.quantity,
-            },
-            quantityAvailable: {
-              decrement: line.quantity,
-            },
-          },
-        });
-      }
-
-      // Clear cart
-      await tx.cartItem.deleteMany({
-        where: { cartId: cart.id },
-      });
-
-      await tx.cart.update({
-        where: { id: cart.id },
-        data: {
-          status: 'CONVERTED',
-          convertedToOrderId: newOrder.id,
-          subtotal: 0,
-          taxAmount: 0,
-          shippingAmount: 0,
-          totalAmount: 0,
-        },
-      });
-
-      return newOrder;
+      return {
+        order: orderWithRelations!,
+        charges,
+        customerName: customer.company?.name ?? 'Unknown Customer',
+      };
     });
 
     return successResponse(
       {
         order: {
-          id: order.id,
-          orderNumber: order.orderNumber,
-          customerId: order.customerId,
-          status: order.status,
-          totalAmount: Number(order.totalAmount),
-          subtotal: Number(order.subtotal),
-          tax: Number(order.taxAmount),
-          shipping: Number(order.shippingAmount),
-          lines: order.lines.map((line) => ({
+          id: order.order.id,
+          orderNumber: order.order.orderNumber,
+          customerId: order.order.customerId,
+          customerName: order.customerName,
+          status: order.order.status.toLowerCase(),
+          totalAmount: Number(order.order.totalAmount),
+          subtotal: Number(order.order.subtotal),
+          tax: Number(order.order.taxAmount),
+          shipping: Number(order.order.shippingAmount),
+          lines: order.order.lines.map((line) => ({
             id: line.id,
             productId: line.productId,
-            productName: line.product.name,
+            productName: line.product?.name || 'Unknown Product',
             quantity: line.quantity,
             unitPrice: Number(line.unitPrice),
-            totalPrice: Number(line.totalAmount),
+            totalPrice: Number(line.totalAmount ?? line.subtotal),
           })),
-          createdAt: order.createdAt.toISOString(),
+          createdAt: order.order.createdAt.toISOString(),
         },
         message: 'Order created successfully',
       },

@@ -9,6 +9,7 @@ import { successResponse, Errors } from '@/app/api/_utils/response';
 import { requireTenant } from '@/app/api/_utils/tenant';
 import { requireAuth } from '@/app/api/_utils/auth';
 import { withTenant } from '@/lib/prisma';
+import { computeCharges } from '@/lib/services/pricing';
 
 /**
  * Get current user's cart
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
           data: {
             portalUserId: user.id,
             tenantId: tenant.tenantId,
+            customerId: user.customerId,
             status: 'ACTIVE',
           },
           include: {
@@ -74,13 +76,18 @@ export async function GET(request: NextRequest) {
         });
       }
 
+      const tenantSettings = await tx.tenantSettings.findUnique({
+        where: { tenantId: tenant.tenantId },
+      });
+
       // Calculate totals
       const subtotal = userCart.items.reduce(
         (sum, item) => sum + Number(item.subtotal),
         0
       );
-      const tax = subtotal * 0.09; // 9% tax rate (should come from tenant settings)
-      const shipping = subtotal > 100 ? 0 : 5.0; // Free shipping over $100
+      const { taxAmount: tax, shippingAmount: shipping } = computeCharges(subtotal, {
+        tenantSettings: tenantSettings as unknown as Record<string, unknown> | null,
+      });
       const total = subtotal + tax + shipping;
 
       return {

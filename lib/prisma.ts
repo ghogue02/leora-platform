@@ -301,6 +301,8 @@ export async function ensureDefaultPortalRole(
     { key: 'portal.cart.manage', name: 'Manage Cart' },
     { key: 'portal.favorites.manage', name: 'Manage Favorites' },
     { key: 'portal.insights.view', name: 'View Insights' },
+    { key: 'portal.invoices.view', name: 'View Invoices' },
+    { key: 'portal.account.view', name: 'View Account' },
     { key: 'portal.reports.view', name: 'View Reports' },
   ];
 

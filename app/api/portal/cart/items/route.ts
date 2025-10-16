@@ -32,21 +32,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { productId, skuId, quantity } = validatedBody.data;
+    const { productId, quantity } = validatedBody.data;
 
     const result = await withTenant(tenant.tenantId, async (tx) => {
+      const tenantSettings = await tx.tenantSettings.findUnique({
+        where: { tenantId: tenant.tenantId },
+      });
+
       // Validate product exists and is active
       const product = await tx.product.findUnique({
         where: { id: productId },
         select: {
           id: true,
           name: true,
-          status: true,
+          active: true,
           sku: true,
         },
       });
 
-      if (!product || product.status !== 'ACTIVE') {
+      if (!product || !product.active) {
         throw new Error('Product not found or inactive');
       }
 
@@ -135,7 +139,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Update cart totals
-      await updateCartTotals(tx, cart.id);
+      await updateCartTotals(tx, cart.id, tenantSettings as Record<string, unknown> | null);
 
       return {
         id: cartItem.id,
@@ -190,6 +194,10 @@ export async function PATCH(request: NextRequest) {
     const { itemId, quantity } = validatedBody.data;
 
     const result = await withTenant(tenant.tenantId, async (tx) => {
+      const tenantSettings = await tx.tenantSettings.findUnique({
+        where: { tenantId: tenant.tenantId },
+      });
+
       // Find cart item
       const cartItem = await tx.cartItem.findUnique({
         where: { id: itemId },
@@ -205,7 +213,10 @@ export async function PATCH(request: NextRequest) {
 
       // Check inventory
       const inventory = await tx.inventory.findFirst({
-        where: { productId: cartItem.productId },
+        where: {
+          productId: cartItem.productId,
+          tenantId: tenant.tenantId,
+        },
       });
 
       const availableInventory = inventory?.quantityAvailable || 0;
@@ -233,7 +244,7 @@ export async function PATCH(request: NextRequest) {
       });
 
       // Update cart totals
-      await updateCartTotals(tx, cartItem.cartId);
+      await updateCartTotals(tx, cartItem.cartId, tenantSettings as Record<string, unknown> | null);
 
       return {
         id: updatedItem.id,
