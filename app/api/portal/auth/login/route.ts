@@ -88,19 +88,6 @@ export async function POST(request: NextRequest) {
       },
       include: {
         tenant: true,
-        roleAssignments: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
       },
     });
 
@@ -202,11 +189,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract roles and permissions
-    const roles = user.roleAssignments?.map((ra) => ra.role.name) || ['portal_customer'];
+    const roleRows = await prisma.$queryRaw<Array<{ name: string; id: string }>>`
+      SELECT r.name, r.id
+      FROM portal_user_roles pur
+      JOIN roles r ON r.id = pur."roleId"
+      WHERE pur."portalUserId" = ${user.id}
+    `;
+
+    const roles = roleRows.length > 0 ? roleRows.map((row) => row.name) : ['portal_customer'];
+
+    const permissionRows = await prisma.$queryRaw<Array<{ key: string }>>`
+      SELECT DISTINCT p.key
+      FROM portal_user_roles pur
+      JOIN role_permissions rp ON rp."roleId" = pur."roleId"
+      JOIN permissions p ON p.id = rp."permissionId"
+      WHERE pur."portalUserId" = ${user.id}
+    `;
+
     const permissions =
-      user.roleAssignments?.flatMap((ra) =>
-        ra.role.rolePermissions?.map((rp) => rp.permission.name)
-      ) || getPermissionsForRoles(roles);
+      permissionRows.length > 0
+        ? permissionRows.map((row) => row.key)
+        : getPermissionsForRoles(roles);
 
     // Generate tokens
     const tokenUser: TokenUser = {
