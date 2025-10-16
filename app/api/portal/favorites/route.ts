@@ -24,7 +24,7 @@ type FavoritesList = Prisma.ListGetPayload<{
             description: true;
             category: true;
             imageUrl: true;
-            status: true;
+            active: true;
             skus: {
               select: {
                 basePrice: true;
@@ -59,7 +59,7 @@ async function getOrCreateFavoritesListTx(
               description: true,
               category: true,
               imageUrl: true,
-              status: true,
+              active: true,
               skus: {
                 select: {
                   basePrice: true,
@@ -98,7 +98,7 @@ async function getOrCreateFavoritesListTx(
               description: true,
               category: true,
               imageUrl: true,
-              status: true,
+              active: true,
               skus: {
                 select: {
                   basePrice: true,
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
         ? Number(item.product.skus[0].basePrice)
         : null,
       imageUrl: item.product?.imageUrl ?? null,
-      status: item.product?.status ?? null,
+      status: item.product ? (item.product.active ? 'ACTIVE' : 'INACTIVE') : null,
       addedAt: item.createdAt.toISOString(),
     }));
 
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
         where: {
           id: productId,
           tenantId: tenant.tenantId,
-          status: 'ACTIVE',
+          active: true,
         },
         select: {
           id: true,
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
           description: true,
           category: true,
           imageUrl: true,
-          status: true,
+          active: true,
           skus: {
             select: {
               basePrice: true,
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
               description: true,
               category: true,
               imageUrl: true,
-              status: true,
+              active: true,
               skus: {
                 select: {
                   basePrice: true,
@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
           ? Number(favorite.product.skus[0].basePrice)
           : null,
         imageUrl: favorite.product?.imageUrl ?? null,
-        status: favorite.product?.status ?? null,
+        status: favorite.product ? (favorite.product.active ? 'ACTIVE' : 'INACTIVE') : null,
         addedAt: favorite.createdAt.toISOString(),
       },
       201

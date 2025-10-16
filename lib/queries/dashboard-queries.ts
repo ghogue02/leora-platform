@@ -33,7 +33,12 @@ export async function getAccountsNeedingAttention(
       customer: {
         select: {
           id: true,
-          companyName: true,
+          tradeName: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
           accountNumber: true,
         },
       },
@@ -184,7 +189,6 @@ export async function getProductPenetration(
   const totalCustomers = await prisma.customer.count({
     where: {
       tenantId,
-      status: 'ACTIVE',
     },
   });
 
@@ -350,11 +354,16 @@ export async function getCallPlanCoverage(
       },
     },
     include: {
-      customer: {
+  customer: {
+    select: {
+      tradeName: true,
+      company: {
         select: {
-          companyName: true,
+          name: true,
         },
       },
+    },
+  },
       user: {
         select: {
           fullName: true,
@@ -371,9 +380,12 @@ export async function getCallPlanCoverage(
   return {
     totalPlans: callPlans.length,
     byStatus: Object.fromEntries(byStatus),
-    plans: callPlans.map((p) => ({
-      id: p.id,
-      customerName: p.customer?.companyName || 'Unknown',
+  plans: callPlans.map((p) => ({
+    id: p.id,
+    customerName:
+      p.customer?.tradeName ||
+      p.customer?.company?.name ||
+      'Unknown',
       salesRepName: p.user?.fullName || 'Unknown',
       planDate: p.planDate,
       status: p.status,

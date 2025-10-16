@@ -133,7 +133,7 @@ export async function createTestProduct(tenantId: string, data?: Partial<any>) {
       description: data?.description || 'Test product description',
       category: data?.category || 'Wine',
       brand: data?.brand || 'Test Brand',
-      status: data?.status || 'ACTIVE',
+      active: data?.active ?? true,
       tenantId,
     },
   });

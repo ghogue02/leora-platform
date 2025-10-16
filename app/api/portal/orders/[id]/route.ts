@@ -43,7 +43,12 @@ export async function GET(
         include: {
           customer: {
             select: {
-              companyName: true,
+              company: {
+                select: {
+                  name: true,
+                },
+              },
+              tradeName: true,
             },
           },
           lines: {
@@ -115,7 +120,10 @@ export async function GET(
       id: order.id,
       orderNumber: order.orderNumber,
       customerId: order.customerId,
-      customerName: order.customer?.companyName || 'Unknown Customer',
+      customerName:
+        order.customer?.tradeName ||
+        order.customer?.company?.name ||
+        'Unknown Customer',
       status: order.status.toLowerCase(),
       totalAmount: Number(order.totalAmount),
       subtotal: Number(order.subtotal),

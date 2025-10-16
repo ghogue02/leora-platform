@@ -51,7 +51,8 @@ export async function getPriceForProduct(
  */
 export async function updateCartTotals(
   tx: PrismaClient,
-  cartId: string
+  cartId: string,
+  _tenantSettings?: Record<string, unknown> | null
 ): Promise<void> {
   const allItems = await tx.cartItem.findMany({
     where: { cartId },

@@ -84,7 +84,10 @@ async function prepareOrderLines(
       throw new Error(`Insufficient inventory for ${product.name}. Available: ${available}`);
     }
 
-    const calculatedPrice = line.unitPrice ?? (await resolveProductPrice(tx, line.productId)).price;
+    const resolvedPrice = await resolveProductPrice(tx, tenantId, line.productId, {
+      customerId,
+    });
+    const calculatedPrice = line.unitPrice ?? resolvedPrice.price;
     const lineSubtotal = calculatedPrice * line.quantity;
     subtotal += lineSubtotal;
     if (!product.isSample) {
