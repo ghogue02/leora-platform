@@ -35,7 +35,7 @@ export function successResponse<T>(data: T, status = 200): NextResponse<ApiSucce
 }
 
 /**
- * Error response helper
+ * Error response helper with automatic logging
  */
 export function errorResponse(
   message: string,
@@ -43,13 +43,26 @@ export function errorResponse(
   code?: string,
   details?: unknown
 ): NextResponse<ApiErrorResponse> {
+  // Log error details for debugging
+  console.error('[API Error]', {
+    timestamp: new Date().toISOString(),
+    status,
+    code,
+    message,
+    details: details instanceof Error ? {
+      name: details.name,
+      message: details.message,
+      stack: details.stack,
+    } : details,
+  });
+
   return NextResponse.json(
     {
       success: false,
       error: {
         message,
         code,
-        details,
+        details: process.env.NODE_ENV === 'development' ? details : undefined,
       },
     },
     { status }

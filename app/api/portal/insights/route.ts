@@ -465,23 +465,33 @@ export async function GET(request: NextRequest) {
 
     return successResponse(insights);
   } catch (error) {
-    console.error('Error fetching insights:', error);
+    // Enhanced error logging for debugging
+    console.error('[Insights API] Error details:', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : error,
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+    });
 
     if (error instanceof Error && error.message === 'Authentication required') {
+      console.error('[Insights API] Authentication failed');
       return Errors.unauthorized();
     }
 
     if (error instanceof Error && error.message.startsWith('Permission denied')) {
+      console.error('[Insights API] Permission denied:', error.message);
       return Errors.forbidden();
     }
 
     if (isDatabaseOrTenantIssue(error)) {
-      console.warn(
-        '[Insights] Falling back to demo insights because live data is unavailable.'
-      );
+      console.warn('[Insights API] Database/tenant issue, falling back to demo data');
       return successResponse(buildDemoInsights());
     }
 
+    console.error('[Insights API] Unhandled error, returning 500');
     return Errors.serverError('Failed to fetch insights');
   }
 }

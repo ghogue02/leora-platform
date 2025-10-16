@@ -34,17 +34,43 @@ export async function withPortalUserFromRequest(
     autoProvision?: boolean;
   }
 ): Promise<PortalUser> {
-  const context = await prismaWithPortalUserFromRequest(request, options);
+  try {
+    console.log('[Auth] Extracting user from request:', {
+      url: request.url,
+      method: request.method,
+      requiredPermissions: options?.requirePermissions,
+    });
 
-  return {
-    id: context.portalUserId,
-    email: context.email,
-    name: context.email.split('@')[0], // Fallback name
-    role: context.roles[0] || 'portal_user',
-    permissions: context.permissions,
-    customerId: context.customerId,
-    tenantId: context.tenantId,
-  };
+    const context = await prismaWithPortalUserFromRequest(request, options);
+
+    console.log('[Auth] User authenticated successfully:', {
+      userId: context.portalUserId,
+      email: context.email,
+      tenantId: context.tenantId,
+      roles: context.roles,
+      permissionCount: context.permissions.length,
+    });
+
+    return {
+      id: context.portalUserId,
+      email: context.email,
+      name: context.email.split('@')[0], // Fallback name
+      role: context.roles[0] || 'portal_user',
+      permissions: context.permissions,
+      customerId: context.customerId,
+      tenantId: context.tenantId,
+    };
+  } catch (error) {
+    console.error('[Auth] Failed to extract user:', {
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      } : error,
+      url: request.url,
+    });
+    throw error;
+  }
 }
 
 /**
