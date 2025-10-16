@@ -25,12 +25,19 @@ Run the migration SQL to convert all enum columns to text type.
 
 ### Option 1: Run via Supabase SQL Editor (Recommended)
 
+**Step 1: Run main migration**
 1. Go to Supabase Dashboard
 2. Navigate to **SQL Editor**
 3. Create new query
-4. Copy contents of `prisma/migrations/convert-enums-to-text.sql`
+4. Copy contents of `prisma/migrations/convert-enums-to-text-v2.sql`
 5. Execute the migration
 6. Verify with the queries at the bottom
+
+**Step 2: Run cleanup migration for remaining enums**
+1. Create another new query in SQL Editor
+2. Copy contents of `prisma/migrations/convert-remaining-enums.sql`
+3. Execute the migration
+4. Verify all enums are converted (query should return 0 rows)
 
 ### Option 2: Run via Command Line
 
