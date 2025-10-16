@@ -249,7 +249,9 @@ export async function withPortalUserFromRequest(
   if (requirePermissions.length > 0) {
     const hasPermissions = requirePermissions.every(p => permissions.has(p));
     if (!hasPermissions) {
-      throw new Error(`Missing required permissions: ${requirePermissions.join(', ')}`);
+      throw new Error(
+        `Permission denied: missing required permissions ${requirePermissions.join(', ')}`
+      );
     }
   }
 
@@ -290,6 +292,50 @@ async function autoProvisionPortalUser(
         roleType: 'PORTAL',
         isDefault: false,
         isSystem: true,
+      },
+    });
+  }
+
+  // Ensure portal role has baseline permissions needed for dashboard access
+  const defaultPortalPermissions = [
+    { key: 'portal.access', name: 'Access Portal' },
+    { key: 'portal.catalog.view', name: 'View Catalog' },
+    { key: 'portal.orders.view', name: 'View Orders' },
+    { key: 'portal.orders.create', name: 'Create Orders' },
+    { key: 'portal.cart.manage', name: 'Manage Cart' },
+    { key: 'portal.favorites.manage', name: 'Manage Favorites' },
+    { key: 'portal.insights.view', name: 'View Insights' },
+    { key: 'portal.reports.view', name: 'View Reports' },
+  ];
+
+  for (const permissionMeta of defaultPortalPermissions) {
+    const permission = await prisma.permission.upsert({
+      where: { key: permissionMeta.key },
+      update: {
+        name: permissionMeta.name,
+        category: 'portal',
+      },
+      create: {
+        tenantId,
+        key: permissionMeta.key,
+        name: permissionMeta.name,
+        category: 'portal',
+      },
+    });
+
+    await prisma.rolePermission.upsert({
+      where: {
+        tenantId_roleId_permissionId: {
+          tenantId,
+          roleId: portalRole.id,
+          permissionId: permission.id,
+        },
+      },
+      update: {},
+      create: {
+        tenantId,
+        roleId: portalRole.id,
+        permissionId: permission.id,
       },
     });
   }
