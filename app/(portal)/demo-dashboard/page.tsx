@@ -104,7 +104,7 @@ export default function DemoDashboardPage() {
                           ? 'destructive'
                           : alert.severity === 'medium'
                           ? 'warning'
-                          : 'secondary'
+                          : 'default'
                       }
                     >
                       {alert.type.replace('_', ' ')}
