@@ -9,7 +9,7 @@ import { requireTenant } from '@/app/api/_utils/tenant';
 import { requirePermission } from '@/app/api/_utils/auth';
 import { insightFilterSchema } from '@/lib/validations/portal';
 import { withTenant } from '@/lib/prisma';
-import { Prisma, type OrderStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 /**
  * Deterministic demo insights payload used when live data is unavailable.
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const insights = await withTenant(tenant.tenantId, async (tx) => {
-      const excludedStatuses: OrderStatus[] = ['CANCELLED', 'DRAFT'];
+      const excludedStatuses = ['CANCELLED', 'DRAFT'];
 
       const ordersWhereCurrent = {
         tenantId: tenant.tenantId,
