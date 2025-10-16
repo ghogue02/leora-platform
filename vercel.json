@@ -101,7 +101,6 @@
       "SKIP_ENV_VALIDATION": "false"
     }
   },
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
   "git": {
     "deploymentEnabled": true
   }
