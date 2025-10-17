@@ -1,0 +1,55 @@
+# =============================================================================
+# SUPABASE RESET - COPY AND PASTE THESE COMMANDS
+# =============================================================================
+
+# Step 1: Set your Supabase access token
+export SUPABASE_ACCESS_TOKEN="sbp_8202d904ec05631d02528679a0493731de852521"
+
+# Step 2: Navigate to project directory
+cd /Users/greghogue/Leora
+
+# Step 3: Link to your Supabase project
+supabase link --project-ref zqezunzlyjkseugujkrl
+
+# Step 4: Perform database reset (⚠️ DELETES ALL DATA!)
+supabase db reset --linked
+
+# =============================================================================
+# AFTER RESET - REBUILD DATABASE
+# =============================================================================
+
+# Step 5: Push clean Prisma schema to database
+npx prisma db push --accept-data-loss
+
+# Step 6: Seed initial data
+npm run seed
+
+# Step 7: Verify it works
+npx tsx scripts/test-deployed-schema.ts
+
+# Step 8: Deploy to Vercel
+git add -A
+git commit -m "Fresh start after Supabase reset"
+git push
+
+# =============================================================================
+# EXPECTED RESULTS AFTER RESET
+# =============================================================================
+# ✅ Clean database with correct schema
+# ✅ Well Crafted tenant
+# ✅ 3 sample products
+# ✅ 3 sample customers
+# ✅ Demo portal users
+# ✅ Sample orders
+# ✅ Dashboard will work with demo data
+# ✅ All schema mismatches gone
+# ✅ No 500 errors
+
+# =============================================================================
+# ALTERNATIVE: Test First Before Reset
+# =============================================================================
+# Since your schema is verified working, you might want to check logs first:
+#
+# vercel logs leora-platform.vercel.app | grep "\[Insights\]"
+#
+# This will show the exact auth error. The schema is 100% correct!
